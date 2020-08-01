@@ -4,10 +4,7 @@ import com.example.ConstructionCompanyApplication.APIConfiguration
 import com.example.ConstructionCompanyApplication.APIConfiguration.Companion.API_BASE_URL
 import com.example.ConstructionCompanyApplication.dto.*
 import com.example.ConstructionCompanyApplication.repository.*
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.type.SimpleType
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import org.springframework.hateoas.EntityModel
@@ -18,14 +15,17 @@ import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.io.IOException
 import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
 
-abstract class AbstractService<R : AbstractRepository, E : AbstractDto>(private val repositoryClass: KClass<R>) :
+abstract class AbstractService<R : AbstractRepository, E : AbstractDto> :
     APIConfiguration {
+    private val dtoType: Type = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[1]
+    private val repositoryClass: KClass<R> =
+        ((javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<R>).kotlin
 
-    private val dtoType = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[1]
     private val objectMapper = ObjectMapper().registerModule(Jackson2HalModule())
     private val typeFactory = objectMapper.typeFactory
     private val repository: R = run {
@@ -43,14 +43,16 @@ abstract class AbstractService<R : AbstractRepository, E : AbstractDto>(private 
         if (!response.isSuccessful) {
             throw IOException(if (response.errorBody() != null) response.errorBody()!!.string() else "Unknown error")
         }
-        val returnType = typeFactory.constructParametricType(
+
+        val modelType = typeFactory.constructParametricType(
             PagedModel::class.java,
             typeFactory.constructParametricType(
                 EntityModel::class.java,
                 typeFactory.constructType(dtoType)
             )
         )
-        return objectMapper.readValue(response.body()?.string(), returnType)
+
+        return objectMapper.readValue(response.body()?.string(), modelType)
     }
 
     fun deleteById(id: Long): Boolean {
@@ -63,77 +65,81 @@ abstract class AbstractService<R : AbstractRepository, E : AbstractDto>(private 
     }
 
     fun save(entity: E): E? {
-        val call = repository.save(RequestBody.create(MediaType.get("application/json"), objectMapper.writeValueAsString(entity)))
+        val call = repository.save(toRequestBody(entity))
         val response = call.execute()
         if (!response.isSuccessful) {
             throw IOException(if (response.errorBody() != null) response.errorBody()!!.string() else "Unknown error")
         }
-        val returnType = typeFactory.constructType(dtoType)
-        return objectMapper.readValue(response.body()?.string(), returnType) as E?
+
+        val modelType = typeFactory.constructType(dtoType)
+        return objectMapper.readValue(response.body()?.string(), modelType) as E?
     }
+
+    private fun toRequestBody(dto: AbstractDto) =
+        RequestBody.create(MediaType.get("application/json"), objectMapper.writeValueAsString(dto))
 }
 
 @Service
-class BrigadeMemberService : AbstractService<BrigadeMemberRepository, BrigadeMember>(BrigadeMemberRepository::class)
+class BrigadeMemberService : AbstractService<BrigadeMemberRepository, BrigadeMember>()
 
 @Service
-class BrigadeService : AbstractService<BrigadeRepository, Brigade>(BrigadeRepository::class)
+class BrigadeService : AbstractService<BrigadeRepository, Brigade>()
 
 @Service
-class BuildObjectService : AbstractService<BuildObjectRepository, BuildObject>(BuildObjectRepository::class)
+class BuildObjectService : AbstractService<BuildObjectRepository, BuildObject>()
 
 @Service
-class CustomerService : AbstractService<CustomerRepository, Customer>(CustomerRepository::class)
+class CustomerService : AbstractService<CustomerRepository, Customer>()
 
 @Service
-class EstimateService : AbstractService<EstimateRepository, Estimate>(EstimateRepository::class)
+class EstimateService : AbstractService<EstimateRepository, Estimate>()
 
 @Service
-class MachineryService : AbstractService<MachineryRepository, Machinery>(MachineryRepository::class)
+class MachineryService : AbstractService<MachineryRepository, Machinery>()
 
 @Service
-class MachineryModelService : AbstractService<MachineryModelRepository, MachineryModel>(MachineryModelRepository::class)
+class MachineryModelService : AbstractService<MachineryModelRepository, MachineryModel>()
 
 @Service
-class MachineryTypeService : AbstractService<MachineryTypeRepository, MachineryType>(MachineryTypeRepository::class)
+class MachineryTypeService : AbstractService<MachineryTypeRepository, MachineryType>()
 
 @Service
-class ManagementService : AbstractService<ManagementRepository, Management>(ManagementRepository::class)
+class ManagementService : AbstractService<ManagementRepository, Management>()
 
 @Service
-class MaterialService : AbstractService<MaterialRepository, Material>(MaterialRepository::class)
+class MaterialService : AbstractService<MaterialRepository, Material>()
 
 @Service
 class MaterialConsumptionService :
-    AbstractService<MaterialConsumptionRepository, MaterialConsumption>(MaterialConsumptionRepository::class)
+    AbstractService<MaterialConsumptionRepository, MaterialConsumption>()
 
 @Service
-class ObjectBrigadeService : AbstractService<ObjectBrigadeRepository, ObjectBrigade>(ObjectBrigadeRepository::class)
+class ObjectBrigadeService : AbstractService<ObjectBrigadeRepository, ObjectBrigade>()
 
 @Service
 class ObjectMachineryService :
-    AbstractService<ObjectMachineryRepository, ObjectMachinery>(ObjectMachineryRepository::class)
+    AbstractService<ObjectMachineryRepository, ObjectMachinery>()
 
 @Service
-class PlotService : AbstractService<PlotRepository, Plot>(PlotRepository::class)
+class PlotService : AbstractService<PlotRepository, Plot>()
 
 @Service
-class PrototypeService : AbstractService<PrototypeRepository, Prototype>(PrototypeRepository::class)
+class PrototypeService : AbstractService<PrototypeRepository, Prototype>()
 
 @Service
-class PrototypeTypeService : AbstractService<PrototypeTypeRepository, PrototypeType>(PrototypeTypeRepository::class)
+class PrototypeTypeService : AbstractService<PrototypeTypeRepository, PrototypeType>()
 
 @Service
-class StaffService : AbstractService<StaffRepository, Staff>(StaffRepository::class)
+class StaffService : AbstractService<StaffRepository, Staff>()
 
 @Service
-class TitleService : AbstractService<TitleRepository, Title>(TitleRepository::class)
+class TitleService : AbstractService<TitleRepository, Title>()
 
 @Service
-class TitleCategoryService : AbstractService<TitleCategoryRepository, TitleCategory>(TitleCategoryRepository::class)
+class TitleCategoryService : AbstractService<TitleCategoryRepository, TitleCategory>()
 
 @Service
-class WorkScheduleService : AbstractService<WorkScheduleRepository, WorkSchedule>(WorkScheduleRepository::class)
+class WorkScheduleService : AbstractService<WorkScheduleRepository, WorkSchedule>()
 
 @Service
-class WorkTypeService : AbstractService<WorkTypeRepository, WorkType>(WorkTypeRepository::class)
+class WorkTypeService : AbstractService<WorkTypeRepository, WorkType>()

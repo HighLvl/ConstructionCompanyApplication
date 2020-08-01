@@ -8,6 +8,8 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.type.SimpleType
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.mediatype.hal.Jackson2HalModule
@@ -61,7 +63,7 @@ abstract class AbstractService<R : AbstractRepository, E : AbstractDto>(private 
     }
 
     fun save(entity: E): E? {
-        val call = repository.save(objectMapper.writeValueAsString(entity))
+        val call = repository.save(RequestBody.create(MediaType.get("application/json"), objectMapper.writeValueAsString(entity)))
         val response = call.execute()
         if (!response.isSuccessful) {
             throw IOException(if (response.errorBody() != null) response.errorBody()!!.string() else "Unknown error")

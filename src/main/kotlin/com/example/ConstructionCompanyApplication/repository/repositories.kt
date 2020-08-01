@@ -1,6 +1,7 @@
 package com.example.ConstructionCompanyApplication.repository
 
 import com.example.ConstructionCompanyApplication.dto.AbstractDto
+import okhttp3.RequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
 import org.springframework.hateoas.EntityModel
@@ -16,7 +17,7 @@ interface AbstractRepository {
     fun getAll(): Call<ResponseBody>
 
     @POST(".")
-    fun save(@Body entity: String): Call<ResponseBody>
+    fun save(@Body entity: RequestBody): Call<ResponseBody>
 
     @DELETE("{id}")
     fun deleteById(@Path("id") id: Long): Call<ResponseBody>

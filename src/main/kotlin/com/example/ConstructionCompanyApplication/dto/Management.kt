@@ -1,6 +1,15 @@
 package com.example.ConstructionCompanyApplication.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import javafx.beans.property.SimpleObjectProperty
+import tornadofx.getValue
+import tornadofx.setValue
+
 class Management(
-    var chief: Staff? = null,
+    chief: Staff = Staff(),
 	id: Long? = null
-) : AbstractDto(id)
+) : AbstractDto(id) {
+    @JsonIgnore
+    val chiefProperty = SimpleObjectProperty<Staff>(chief)
+    var chief by chiefProperty
+}

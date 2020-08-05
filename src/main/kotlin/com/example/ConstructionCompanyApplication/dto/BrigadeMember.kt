@@ -1,12 +1,40 @@
 package com.example.ConstructionCompanyApplication.dto
 
-import java.sql.Date
+import com.fasterxml.jackson.annotation.JsonIgnore
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleObjectProperty
+import java.time.LocalDate
+import tornadofx.*
 
 class BrigadeMember(
-    var startDate: Date? = null,
-    var finishDate: Date? = null,
-    var isBrigadier: Boolean = false,
-    var brigade: Brigade? = null,
-    var staff: Staff? = null,
-	id: Long? = null
-) : AbstractDto(id)
+    startDate: LocalDate? = null,
+    finishDate: LocalDate? = null,
+    isBrigadier: Boolean = false,
+    brigade: Brigade = Brigade(),
+    staff: Staff = Staff(),
+    id: Long? = null
+) : AbstractDto(id) {
+    @JsonIgnore
+    @ColumnName("Начало работы")
+    val startDateProperty = SimpleObjectProperty<LocalDate>(startDate)
+    var startDate by startDateProperty
+
+    @JsonIgnore
+    @ColumnName("Конец работы")
+    val finishDateProperty = SimpleObjectProperty<LocalDate>(finishDate)
+    var finishDate by finishDateProperty
+
+    @JsonIgnore
+    @ColumnName("Бригадир")
+    val isBrigadierProperty = SimpleBooleanProperty(isBrigadier)
+    var isBrigadier by isBrigadierProperty
+
+    @JsonIgnore
+    val brigadeProperty = SimpleObjectProperty<Brigade>(brigade)
+    var brigade by brigadeProperty
+
+    @JsonIgnore
+    val staffProperty = SimpleObjectProperty<Staff>(staff)
+    var staff by staffProperty
+
+}

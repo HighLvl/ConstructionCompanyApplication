@@ -4,17 +4,18 @@ import com.example.ConstructionCompanyApplication.dto.AbstractDto
 import okhttp3.RequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
-import org.springframework.hateoas.EntityModel
-import org.springframework.hateoas.PagedModel
+
+
 import retrofit2.Call
 import retrofit2.http.*
 
 @Target(AnnotationTarget.CLASS)
 annotation class BaseUrl(val url: String)
 
+@JvmSuppressWildcards
 interface AbstractRepository {
     @GET(".")
-    fun getAll(): Call<ResponseBody>
+    fun getAll(@QueryMap pageQueryMap: Map<String, Any>): Call<ResponseBody>
 
     @POST(".")
     fun save(@Body entity: RequestBody): Call<ResponseBody>

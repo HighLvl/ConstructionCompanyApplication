@@ -7,10 +7,12 @@ import com.example.ConstructionCompanyApplication.repository.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.MediaType
 import okhttp3.RequestBody
+import org.springframework.data.domain.Pageable
 import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.mediatype.hal.Jackson2HalModule
-import org.springframework.stereotype.Service
+
+
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.io.IOException
@@ -37,8 +39,8 @@ abstract class AbstractService<R : AbstractRepository, E : AbstractDto> :
         retrofit.create(repositoryClass.java)
     }
 
-    fun getAll(): PagedModel<EntityModel<E>>? {
-        val call = repository.getAll()
+    fun getAll(pageable: Pageable): PagedModel<EntityModel<E>>? {
+        val call = repository.getAll(convertPageableToQueryMap(pageable))
         val response = call.execute()
         if (!response.isSuccessful) {
             throw IOException(if (response.errorBody() != null) response.errorBody()!!.string() else "Unknown error")
@@ -65,7 +67,8 @@ abstract class AbstractService<R : AbstractRepository, E : AbstractDto> :
     }
 
     fun save(entity: E): E? {
-        val call = repository.save(toRequestBody(entity))
+        val requestBody = toRequestBody(entity)
+        val call = repository.save(requestBody)
         val response = call.execute()
         if (!response.isSuccessful) {
             throw IOException(if (response.errorBody() != null) response.errorBody()!!.string() else "Unknown error")
@@ -75,71 +78,74 @@ abstract class AbstractService<R : AbstractRepository, E : AbstractDto> :
         return objectMapper.readValue(response.body()?.string(), modelType) as E?
     }
 
+    private fun convertPageableToQueryMap(pageable: Pageable)
+    = mapOf<String, Any>("page" to pageable.pageNumber, "size" to pageable.pageSize)
+
     private fun toRequestBody(dto: AbstractDto) =
         RequestBody.create(MediaType.get("application/json"), objectMapper.writeValueAsString(dto))
 }
 
-@Service
+
 class BrigadeMemberService : AbstractService<BrigadeMemberRepository, BrigadeMember>()
 
-@Service
+
 class BrigadeService : AbstractService<BrigadeRepository, Brigade>()
 
-@Service
+
 class BuildObjectService : AbstractService<BuildObjectRepository, BuildObject>()
 
-@Service
+
 class CustomerService : AbstractService<CustomerRepository, Customer>()
 
-@Service
+
 class EstimateService : AbstractService<EstimateRepository, Estimate>()
 
-@Service
+
 class MachineryService : AbstractService<MachineryRepository, Machinery>()
 
-@Service
+
 class MachineryModelService : AbstractService<MachineryModelRepository, MachineryModel>()
 
-@Service
+
 class MachineryTypeService : AbstractService<MachineryTypeRepository, MachineryType>()
 
-@Service
+
 class ManagementService : AbstractService<ManagementRepository, Management>()
 
-@Service
+
 class MaterialService : AbstractService<MaterialRepository, Material>()
 
-@Service
+
 class MaterialConsumptionService :
     AbstractService<MaterialConsumptionRepository, MaterialConsumption>()
 
-@Service
+
 class ObjectBrigadeService : AbstractService<ObjectBrigadeRepository, ObjectBrigade>()
 
-@Service
+
 class ObjectMachineryService :
     AbstractService<ObjectMachineryRepository, ObjectMachinery>()
 
-@Service
+
 class PlotService : AbstractService<PlotRepository, Plot>()
 
-@Service
+
 class PrototypeService : AbstractService<PrototypeRepository, Prototype>()
 
-@Service
+
 class PrototypeTypeService : AbstractService<PrototypeTypeRepository, PrototypeType>()
 
-@Service
+
 class StaffService : AbstractService<StaffRepository, Staff>()
 
-@Service
+
 class TitleService : AbstractService<TitleRepository, Title>()
 
-@Service
+
 class TitleCategoryService : AbstractService<TitleCategoryRepository, TitleCategory>()
 
-@Service
+
 class WorkScheduleService : AbstractService<WorkScheduleRepository, WorkSchedule>()
 
-@Service
+
 class WorkTypeService : AbstractService<WorkTypeRepository, WorkType>()

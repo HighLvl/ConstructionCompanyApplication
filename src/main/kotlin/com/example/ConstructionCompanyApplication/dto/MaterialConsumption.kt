@@ -1,8 +1,28 @@
 package com.example.ConstructionCompanyApplication.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleObjectProperty
+import tornadofx.getValue
+import tornadofx.setValue
+
 class MaterialConsumption(
-    var amount: Int = 0,
-    var objectBrigade: ObjectBrigade? = null,
-    var estimate: Estimate? = null,
-	id: Long? = null
-) : AbstractDto(id)
+    amount: Int = 0,
+    objectBrigade: ObjectBrigade = ObjectBrigade(),
+    estimate: Estimate = Estimate(),
+    id: Long? = null
+) : AbstractDto(id) {
+    @JsonIgnore
+    @ColumnName("Количество")
+    val amountProperty = SimpleIntegerProperty(amount)
+    var amount by amountProperty
+
+    @JsonIgnore
+    val objectBrigadeProperty = SimpleObjectProperty<ObjectBrigade>(objectBrigade)
+    var objectBrigade by objectBrigadeProperty
+
+    @JsonIgnore
+    val estimateProperty = SimpleObjectProperty<Estimate>(estimate)
+    var estimate by estimateProperty
+
+}

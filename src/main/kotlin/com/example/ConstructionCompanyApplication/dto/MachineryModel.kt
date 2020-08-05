@@ -23,9 +23,4 @@ class MachineryModel(
     @JsonIgnore
     @ColumnName("Тип")
     val machineryTypeNameProperty =  machineryTypeProperty.select(MachineryType::nameProperty)
-
-    @JsonIgnore
-    @ColumnName("Дата")
-    val dateProperty =  SimpleObjectProperty<LocalDate>(LocalDate.MAX)
-
 }

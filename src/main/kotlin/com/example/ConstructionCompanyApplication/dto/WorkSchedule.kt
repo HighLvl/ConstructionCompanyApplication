@@ -3,8 +3,7 @@ package com.example.ConstructionCompanyApplication.dto
 import com.fasterxml.jackson.annotation.JsonIgnore
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
-import tornadofx.getValue
-import tornadofx.setValue
+import tornadofx.*
 
 class WorkSchedule(
     ord: Int = 0,
@@ -31,4 +30,11 @@ class WorkSchedule(
     val workTypeProperty = SimpleObjectProperty<WorkType>(workType)
     var workType by workTypeProperty
 
+    @JsonIgnore
+    @ColumnName("Вид работ")
+    val workTypeNameProperty = workTypeProperty.select(WorkType::nameProperty)
+
+    @JsonIgnore
+    @ColumnName("Прототип")
+    val prototypeIdProperty = prototypeProperty.select(Prototype::idProperty)
 }

@@ -1,6 +1,7 @@
 package com.example.ConstructionCompanyApplication.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.getValue
 import tornadofx.setValue
@@ -12,4 +13,13 @@ class Management(
     @JsonIgnore
     val chiefProperty = SimpleObjectProperty<Staff>(chief)
     var chief by chiefProperty
+
+    @JsonIgnore
+    @ColumnName("Номер")
+    val idProperty = SimpleLongProperty(id?:0)
+
+    @JsonIgnore
+    @ColumnName("Начальник")
+    val chiefNameProperty = chiefProperty.select(Staff::nameProperty)
+
 }

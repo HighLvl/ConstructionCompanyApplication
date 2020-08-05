@@ -31,4 +31,12 @@ class Staff(
     val chiefProperty = SimpleObjectProperty<Staff>(chief)
     var chief by chiefProperty
 
+    @JsonIgnore
+    @ColumnName("Должность")
+    val titleNameProperty = titleProperty.select(Title::nameProperty)
+
+    @JsonIgnore
+    @ColumnName("Начальник")
+    val chiefNameProperty = chiefProperty.select(Staff::nameProperty)
+
 }

@@ -37,4 +37,11 @@ class BrigadeMember(
     val staffProperty = SimpleObjectProperty<Staff>(staff)
     var staff by staffProperty
 
+    @JsonIgnore
+    @ColumnName("Бригада")
+    val brigadeNameProperty = brigadeProperty.select(Brigade::nameProperty)
+
+    @JsonIgnore
+    @ColumnName("ФИО")
+    val staffNameProperty = staffProperty.select(Staff::nameProperty)
 }

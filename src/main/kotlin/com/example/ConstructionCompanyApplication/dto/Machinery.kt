@@ -17,4 +17,12 @@ class Machinery(
     val managementProperty = SimpleObjectProperty<Management>(management)
     var management by managementProperty
 
+    @JsonIgnore
+    @ColumnName("Модель")
+    val modelNameProperty = modelProperty.select(MachineryModel::nameProperty)
+
+    @JsonIgnore
+    @ColumnName("Строительное управление")
+    val managementIdProperty = managementProperty.select(Management::idProperty)
+
 }

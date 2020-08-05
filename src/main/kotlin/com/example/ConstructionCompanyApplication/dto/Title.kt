@@ -20,4 +20,8 @@ class Title(
     val titleCategoryProperty = SimpleObjectProperty<TitleCategory>(titleCategory)
     var titleCategory by titleCategoryProperty
 
+    @JsonIgnore
+    @ColumnName("Категория")
+    val titleCategoryNameProperty = titleCategoryProperty.select(TitleCategory::nameProperty)
+
 }

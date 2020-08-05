@@ -3,8 +3,7 @@ package com.example.ConstructionCompanyApplication.dto
 import com.fasterxml.jackson.annotation.JsonIgnore
 import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleObjectProperty
-import tornadofx.getValue
-import tornadofx.setValue
+import tornadofx.*
 
 class Plot(
     chief: Staff = Staff(),
@@ -13,7 +12,7 @@ class Plot(
 ) : AbstractDto(id) {
     @JsonIgnore
     @ColumnName("Номер")
-    val idProperty = SimpleLongProperty(id?:0)
+    val idProperty = SimpleLongProperty(id ?: 0)
 
     @JsonIgnore
     val chiefProperty = SimpleObjectProperty<Staff>(chief)
@@ -22,5 +21,13 @@ class Plot(
     @JsonIgnore
     val managementProperty = SimpleObjectProperty<Management>(management)
     var management by managementProperty
+
+    @JsonIgnore
+    @ColumnName("Начальник")
+    val chiefNameProperty = chiefProperty.select(Staff::nameProperty)
+
+    @JsonIgnore
+    @ColumnName("Строительное управление")
+    val managementIdProperty = managementProperty.select(Management::idProperty)
 
 }

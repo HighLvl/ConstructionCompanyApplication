@@ -25,4 +25,16 @@ class MaterialConsumption(
     val estimateProperty = SimpleObjectProperty<Estimate>(estimate)
     var estimate by estimateProperty
 
+    @JsonIgnore
+    @ColumnName("Бригада")
+    val objectBrigadeNameProperty = objectBrigadeProperty.select(ObjectBrigade::brigadeNameProperty)
+
+    @JsonIgnore
+    @ColumnName("Материал")
+    val estimateMaterialNameProperty = estimateProperty.select(Estimate::materialNameProperty)
+
+    @JsonIgnore
+    @ColumnName("Смета")
+    val estimateAmountProperty = estimateProperty.select(Estimate::amountProperty)
+
 }

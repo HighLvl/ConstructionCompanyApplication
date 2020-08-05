@@ -17,6 +17,10 @@ class Brigade(
     var name by nameProperty
 
     @JsonIgnore
-    val tittleProperty = SimpleObjectProperty<Title>(title)
-    var title by tittleProperty
+    val titleProperty = SimpleObjectProperty<Title>(title)
+    var title by titleProperty
+
+    @JsonIgnore
+    @ColumnName("Должность рабочих")
+    val titleNameProperty = titleProperty.select(Title::nameProperty)
 }

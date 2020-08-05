@@ -2,6 +2,7 @@ package com.example.ConstructionCompanyApplication.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.getValue
 import tornadofx.setValue
@@ -20,4 +21,11 @@ class Prototype(
     val prototypeTypeProperty = SimpleObjectProperty<PrototypeType>(prototypeType)
     var prototypeType by prototypeTypeProperty
 
+    @JsonIgnore
+    @ColumnName("Номер")
+    val idProperty = SimpleLongProperty(id?: 0)
+
+    @JsonIgnore
+    @ColumnName("Вид")
+    val prototypeTypeName = prototypeTypeProperty.select(PrototypeType::nameProperty)
 }

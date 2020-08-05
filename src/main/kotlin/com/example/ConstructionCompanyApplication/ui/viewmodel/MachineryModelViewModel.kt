@@ -24,20 +24,19 @@ abstract class AbstractItemViewModel<T : AbstractDto>() : ItemViewModel<T>() {
     private val propertyHandlerMap = mutableMapOf<KProperty1<T, ObservableValue<*>>, KFunction<Unit>>()
 
 
-    private val instanceClass: KClass<T> = ((javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<T>).kotlin
+    private val instanceClass: KClass<T> =
+        ((javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<T>).kotlin
 
     init {
         item = instanceClass.createInstance()
 
-        for (property in instanceClass.memberProperties.filter { it.findAnnotation<ColumnName>() != null }.reversed()) {
+        for (property in instanceClass.memberProperties.filter { it.findAnnotation<ColumnName>() != null }) {
             val returnClass = (property.returnType.classifier as KClass<*>).java
             columnPropertiesMutable[property as KProperty1<T, ObservableValue<*>>] =
                 when {
-                    IntegerProperty::class.java.isAssignableFrom(returnClass) -> {
-                        propertyHandlerMap[property] = PropertyHandler<T>::handleIntegerProperty
-                        bind(property as KProperty1<T, SimpleIntegerProperty>)
-                    }
-                    LongProperty::class.java.isAssignableFrom(returnClass) -> {
+
+                    IntegerProperty::class.java.isAssignableFrom(returnClass)
+                            || LongProperty::class.java.isAssignableFrom(returnClass) -> {
                         propertyHandlerMap[property] = PropertyHandler<T>::handleLongProperty
                         bind(property as KProperty1<T, SimpleLongProperty>)
                     }
@@ -60,9 +59,19 @@ abstract class AbstractItemViewModel<T : AbstractDto>() : ItemViewModel<T>() {
                     SelectedProperty::class.java.isAssignableFrom(returnClass) -> {
                         val selectedProperty = property.get(item) as SelectedProperty<*, *>
                         when {
-                            (AbstractDto::class.java.isAssignableFrom(selectedProperty.sourceClass.java) && selectedProperty.valueClass == String::class) -> {
-                                propertyHandlerMap[property] = PropertyHandler<T>::handleSelectedStringProperty
-                                bind(property as KProperty1<T, SimpleStringProperty>)
+                            (AbstractDto::class.java.isAssignableFrom(selectedProperty.sourceClass.java)) -> {
+                                when (selectedProperty.valueClass) {
+                                    String::class -> {
+                                        propertyHandlerMap[property] = PropertyHandler<T>::handleSelectedStringProperty
+                                        bind(property as KProperty1<T, SimpleStringProperty>)
+                                    }
+                                    Long::class, Number::class -> {
+                                        propertyHandlerMap[property] = PropertyHandler<T>::handleSelectedNumberProperty
+                                        bind(property as KProperty1<T, SimpleObjectProperty<Number>>)
+                                    }
+                                    else -> throw Exception("Unsupported SelectedProperty<, valueClass: ${selectedProperty.valueClass}>")
+                                }
+
                             }
                             else -> throw Exception("Unsupported SelectedProperty")
                         }
@@ -142,6 +151,12 @@ abstract class AbstractItemViewModel<T : AbstractDto>() : ItemViewModel<T>() {
         fun handleSelectedStringProperty(
             property: KProperty1<T, SelectedProperty<AbstractDto, String>>,
             observableValue: ObservableValue<String>
+        ) {
+        }
+
+        fun handleSelectedNumberProperty(
+            property: KProperty1<T, SelectedProperty<AbstractDto, Number>>,
+            observableValue: ObservableValue<Number>
         ) {
         }
     }

@@ -17,6 +17,7 @@ class Management(
     @JsonIgnore
     @ColumnName("Номер")
     val idProperty = SimpleLongProperty(id?:0)
+    override var id: Long? by idProperty
 
     @JsonIgnore
     @ColumnName("Начальник")

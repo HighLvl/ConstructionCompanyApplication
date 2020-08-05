@@ -5,6 +5,7 @@ import com.example.ConstructionCompanyApplication.APIConfiguration.Companion.API
 import com.example.ConstructionCompanyApplication.dto.*
 import com.example.ConstructionCompanyApplication.repository.*
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import org.springframework.data.domain.Pageable
@@ -28,7 +29,7 @@ abstract class AbstractService<R : AbstractRepository, E : AbstractDto> :
     private val repositoryClass: KClass<R> =
         ((javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<R>).kotlin
 
-    private val objectMapper = ObjectMapper().registerModule(Jackson2HalModule())
+    private val objectMapper = ObjectMapper().registerModules(Jackson2HalModule(), JavaTimeModule())
     private val typeFactory = objectMapper.typeFactory
     private val repository: R = run {
         val repositoryUrl = repositoryClass.findAnnotation<BaseUrl>()!!.url + "/"

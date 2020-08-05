@@ -10,7 +10,7 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 
-abstract class AbstractDto(var id: Long? = null) {
+abstract class AbstractDto(open var id: Long? = null) {
 
     override fun equals(other: Any?): Boolean {
         if (this.javaClass != other?.javaClass) return false

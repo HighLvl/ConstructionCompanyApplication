@@ -12,5 +12,5 @@ class WorkType(
     @ColumnName("Название")
     val nameProperty = SimpleStringProperty()
     var name by nameProperty
-    
+
 }

@@ -9,8 +9,8 @@ import tornadofx.setValue
 class Staff(
     name: String? = null,
     phoneNumber: String? = null,
-    title: Title? = Title(),
-    chief: Staff? = Staff(),
+    title: Title = Title(),
+    chief: Staff? = null,
     id: Long? = null
 ) : AbstractDto(id) {
     @JsonIgnore

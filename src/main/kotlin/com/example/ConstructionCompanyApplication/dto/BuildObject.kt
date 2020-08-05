@@ -7,13 +7,18 @@ import tornadofx.*
 import java.time.LocalDate
 
 class BuildObject(
-    startDate: LocalDate? = null,
-    finishDate: LocalDate? = null,
+    startDate: LocalDate = LocalDate.now(),
+    finishDate: LocalDate = LocalDate.now(),
     prototype: Prototype = Prototype(),
     plot: Plot = Plot(),
     customer: Customer = Customer(),
     id: Long? = null
 ) : AbstractDto(id) {
+    @JsonIgnore
+    @ColumnName("Номер")
+    val idProperty = SimpleLongProperty(id ?: 0)
+    override var id: Long? by idProperty
+
     @JsonIgnore
     @ColumnName("Начало строительства")
     val startDateProperty = SimpleObjectProperty<LocalDate>(startDate)
@@ -49,7 +54,5 @@ class BuildObject(
     @ColumnName("Заказчик")
     val customerNameProperty = customerProperty.select(Customer::nameProperty)
 
-    @JsonIgnore
-    @ColumnName("Номер")
-    val idProperty = SimpleLongProperty(id ?: 0)
+
 }

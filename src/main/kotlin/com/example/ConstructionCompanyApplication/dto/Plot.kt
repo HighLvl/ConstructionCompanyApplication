@@ -13,6 +13,7 @@ class Plot(
     @JsonIgnore
     @ColumnName("Номер")
     val idProperty = SimpleLongProperty(id ?: 0)
+    override var id: Long? by idProperty
 
     @JsonIgnore
     val chiefProperty = SimpleObjectProperty<Staff>(chief)

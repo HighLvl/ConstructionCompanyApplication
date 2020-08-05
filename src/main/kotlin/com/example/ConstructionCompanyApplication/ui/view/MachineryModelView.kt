@@ -3,6 +3,7 @@ package com.example.ConstructionCompanyApplication.ui.view
 import com.example.ConstructionCompanyApplication.dto.*
 import com.example.ConstructionCompanyApplication.ui.controller.*
 import com.example.ConstructionCompanyApplication.ui.viewmodel.*
+import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
@@ -79,6 +80,26 @@ abstract class AbstractTableView<DTO : AbstractDto, VM : AbstractItemViewModel<D
                 observableValue: ObservableValue<LocalDate>
             ) {
                 tableView.column(property.columnName, property)
+            }
+
+            override fun handleSelectedNumberProperty(
+                property: KProperty1<DTO, SelectedProperty<AbstractDto, Number>>,
+                observableValue: ObservableValue<Number>
+            ) {
+                tableView.column(property.columnName, property)
+                editCellFieldset.add(field(property.columnName) {
+                    textfield(observableValue)
+                })
+            }
+
+            override fun handleLongProperty(
+                property: KProperty1<DTO, SimpleLongProperty>,
+                observableValue: ObservableValue<Long>
+            ) {
+                tableView.column(property.columnName, property)
+                editCellFieldset.add(field(property.columnName) {
+                    textfield(observableValue as ObservableValue<Number>)
+                })
             }
         })
     }

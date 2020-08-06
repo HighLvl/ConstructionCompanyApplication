@@ -13,7 +13,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -27,9 +26,9 @@
                   <AnchorPane maxHeight="1.7976931348623157E308" prefHeight="1080.0">
                      <children>
                         <Pagination fx:id="pagination" layoutY="463.0" prefHeight="530.0" prefWidth="703.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                        <AnchorPane layoutX="489.0" layoutY="476.0" minWidth="-Infinity" prefHeight="34.0" prefWidth="46.0" AnchorPane.bottomAnchor="12.0" AnchorPane.rightAnchor="160.0">
+                        <AnchorPane layoutX="14.0" layoutY="485.0" minWidth="-Infinity" prefHeight="34.0" prefWidth="46.0" AnchorPane.bottomAnchor="9.399999999999977" AnchorPane.leftAnchor="13.999999999999979">
                            <children>
-                              <MenuButton fx:id="pageSizeMenu" layoutX="-6.0" layoutY="6.0" minHeight="-Infinity" mnemonicParsing="false" prefHeight="21.0" prefWidth="58.0" text="size" AnchorPane.bottomAnchor="6.799999999999997" AnchorPane.rightAnchor="-6.0">
+                              <MenuButton fx:id="pageSizeMenu" layoutX="-11.0" minHeight="-Infinity" mnemonicParsing="false" prefHeight="28.0" prefWidth="68.0" text="size" AnchorPane.bottomAnchor="6.399999999999999" AnchorPane.leftAnchor="0.0">
                                  <items>
                                     <MenuItem fx:id="pageSize25" mnemonicParsing="false" text="25" />
                                     <MenuItem fx:id="pageSize50" mnemonicParsing="false" text="50" />
@@ -43,16 +42,16 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <HBox layoutX="548.0" layoutY="474.0" prefHeight="24.0" prefWidth="154.0" AnchorPane.bottomAnchor="16.399999999999977" AnchorPane.rightAnchor="0.8000000000000398">
+                        <HBox layoutX="543.0" layoutY="482.0" prefHeight="24.0" prefWidth="154.0" AnchorPane.bottomAnchor="6.7999999999999545" AnchorPane.rightAnchor="-7.0">
                            <children>
-                              <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" prefWidth="123.0">
+                              <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="122.0">
                                  <children>
-                                    <Label layoutX="17.0" layoutY="12.0" prefHeight="28.0" prefWidth="88.0" text="Всего записей:" />
+                                    <Label layoutX="-7.0" layoutY="6.0" prefHeight="28.0" prefWidth="114.0" text="Всего записей:" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-7.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="6.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="30.0">
                                  <children>
-                                    <Label fx:id="totalElementsLabel" layoutX="-15.0" layoutY="11.0" prefHeight="30.0" prefWidth="67.0" text="344">
+                                    <Label fx:id="totalElementsLabel" layoutX="-19.0" layoutY="4.0" prefHeight="30.0" prefWidth="65.0" text="344" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-19.0" AnchorPane.rightAnchor="-16.0" AnchorPane.topAnchor="6.0">
                                        <font>
                                           <Font name="System Bold Italic" size="12.0" />
                                        </font>
@@ -71,53 +70,15 @@
    <right>
       <AnchorPane minWidth="-Infinity" prefHeight="529.0" prefWidth="348.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox layoutX="14.0" layoutY="-2.0" prefHeight="529.0" prefWidth="400.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-2.0">
+            <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="-2.0" prefHeight="529.0" prefWidth="400.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-2.0">
                <children>
-                  <Label fx:id="createEditLabel" alignment="CENTER" prefHeight="18.0" prefWidth="209.0" text="Редактировать запись">
-                     <font>
-                        <Font name="System Bold" size="16.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets left="30.0" />
-                     </VBox.margin>
-                  </Label>
-                  <AnchorPane prefHeight="200.0" prefWidth="314.0">
-                     <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0">
-                           <children>
-                              <AnchorPane>
-                                 <children>
-                                    <Pane fx:id="fieldSetPane" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-74.0" AnchorPane.topAnchor="0.0" />
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane maxHeight="-Infinity" minHeight="-Infinity">
-                                 <children>
-                                    <HBox alignment="CENTER" layoutY="133.0" prefHeight="67.0" prefWidth="285.0" AnchorPane.bottomAnchor="0.0">
-                                       <children>
-                                          <AnchorPane>
-                                             <children>
-                                                <Button fx:id="saveButton" layoutX="9.0" layoutY="15.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="96.0" text="Сохранить" AnchorPane.bottomAnchor="15.0" AnchorPane.topAnchor="15.0" />
-                                             </children>
-                                          </AnchorPane>
-                                          <AnchorPane>
-                                             <children>
-                                                <Button fx:id="resetButton" layoutX="16.0" layoutY="15.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="96.0" text="Сбросить" AnchorPane.bottomAnchor="15.0" AnchorPane.topAnchor="15.0" />
-                                             </children>
-                                          </AnchorPane>
-                                       </children>
-                                    </HBox>
-                                 </children>
-                              </AnchorPane>
-                           </children>
-                        </VBox>
-                     </children>
-                  </AnchorPane>
+                  <Button fx:id="addElementButton" alignment="CENTER" minHeight="-Infinity" mnemonicParsing="false" prefHeight="42.0" prefWidth="286.0" text="Добавить запись" />
                   <Label alignment="CENTER" prefHeight="26.0" prefWidth="184.0" text="Связанные таблицы">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
                      <VBox.margin>
-                        <Insets left="30.0" />
+                        <Insets />
                      </VBox.margin>
                   </Label>
                   <AnchorPane>
@@ -130,7 +91,7 @@
                         <Font name="System Bold" size="16.0" />
                      </font>
                      <VBox.margin>
-                        <Insets left="30.0" />
+                        <Insets />
                      </VBox.margin>
                   </Label>
                   <AnchorPane>

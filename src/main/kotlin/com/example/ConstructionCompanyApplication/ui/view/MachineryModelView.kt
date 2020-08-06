@@ -2,26 +2,21 @@ package com.example.ConstructionCompanyApplication.ui.view
 
 import com.example.ConstructionCompanyApplication.dto.*
 import com.example.ConstructionCompanyApplication.ui.controller.*
-import com.example.ConstructionCompanyApplication.ui.viewmodel.*
-import javafx.beans.property.SimpleLongProperty
-import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ObservableValue
+import javafx.beans.property.*
+import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
-import javafx.scene.layout.Pane
-import javafx.util.Callback
+import javafx.scene.paint.Color
 import org.springframework.data.domain.PageRequest
 import tornadofx.*
+import tornadofx.control.DatePickerTableCell
 import java.lang.reflect.ParameterizedType
 import java.time.LocalDate
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
-import kotlin.reflect.full.createInstance
 
-
-abstract class AbstractTableView<DTO : AbstractDto, VM : AbstractItemViewModel<DTO>, C : AbstractController<DTO, VM, *>>(
+abstract class AbstractTableView<DTO : AbstractDto, C : AbstractController<DTO, *>>(
     title: String,
     private val controller: C
 ) : View(title) {
@@ -35,92 +30,110 @@ abstract class AbstractTableView<DTO : AbstractDto, VM : AbstractItemViewModel<D
     private val pageSize50: MenuItem by fxid()
     private val pageSize100: MenuItem by fxid()
     private val createEditLabel: Label by fxid()
-    private val saveButton: Button by fxid()
-    private val resetButton: Button by fxid()
+    private val addElementsButton: Button by fxid()
     private val referrerListView: ListView<AbstractController.LinkInfo> by fxid()
     private val referencingListView: ListView<AbstractController.LinkInfo> by fxid()
     private val filterGridPane: GridPane by fxid()
     private val pagination: Pagination by fxid()
     private val totalElementsLabel: Label by fxid()
-    private val fieldSetPane: Pane by fxid()
     private lateinit var editCellFieldset: Fieldset
 
-    private val viewmodel = controller.model
     private var pageSize = 25
+
+    var tableViewEditModel: TableViewEditModel<DTO> by singleAssign()
 
     init {
         initTableView()
         initPagination()
-        initEditableFieldSet()
         initRelatedLinks()
-
-        viewmodel.handleProperties(object : AbstractItemViewModel.PropertyHandler<DTO> {
-            override fun handleStringProperty(
-                property: KProperty1<DTO, SimpleStringProperty>,
-                observableValue: ObservableValue<String>
-            ) {
-                tableView.column(property.columnName, property)
-                editCellFieldset.add(field(property.columnName) {
-                    textfield(observableValue)
-                })
-            }
-
-            override fun handleSelectedStringProperty(
-                property: KProperty1<DTO, SelectedProperty<AbstractDto, String>>,
-                observableValue: ObservableValue<String>
-            ) {
-                tableView.column(property.columnName, property)
-                editCellFieldset.add(field(property.columnName) {
-                    textfield(observableValue)
-                })
-            }
-
-            override fun handleLocalDateProperty(
-                property: KProperty1<DTO, SimpleObjectProperty<LocalDate>>,
-                observableValue: ObservableValue<LocalDate>
-            ) {
-                tableView.column(property.columnName, property)
-            }
-
-            override fun handleSelectedNumberProperty(
-                property: KProperty1<DTO, SelectedProperty<AbstractDto, Number>>,
-                observableValue: ObservableValue<Number>
-            ) {
-                tableView.column(property.columnName, property)
-                editCellFieldset.add(field(property.columnName) {
-                    textfield(observableValue)
-                })
-            }
-
-            override fun handleLongProperty(
-                property: KProperty1<DTO, SimpleLongProperty>,
-                observableValue: ObservableValue<Long>
-            ) {
-                tableView.column(property.columnName, property)
-                editCellFieldset.add(field(property.columnName) {
-                    textfield(observableValue as ObservableValue<Number>)
-                })
-            }
-        })
     }
 
     private fun initTableView() {
-        viewmodel.rebindOnChange(tableView) {
-            item = it ?: instanceClass.createInstance()
+        TableViewColumnManager(tableView, instanceClass).handleProperties(object :
+            TableViewColumnManager.ColumnHandler<DTO> {
+            override fun handleIntegerColumn(
+                property: KProperty1<DTO, SimpleIntegerProperty>,
+                column: TableColumn<DTO, Int>
+            ) {
+                column.makeEditable()
+            }
 
-        }
+            override fun handleLongColumn(
+                property: KProperty1<DTO, SimpleLongProperty>,
+                column: TableColumn<DTO, Long>
+            ) {
+                column.makeEditable()
+            }
+
+            override fun handleBooleanColumn(
+                property: KProperty1<DTO, SimpleBooleanProperty>,
+                column: TableColumn<DTO, Boolean>
+            ) {
+            }
+
+            override fun handleStringColumn(
+                property: KProperty1<DTO, SimpleStringProperty>,
+                column: TableColumn<DTO, String>
+            ) {
+                column.makeEditable()
+            }
+
+            override fun handleLocalDateColumn(
+                property: KProperty1<DTO, SimpleObjectProperty<LocalDate>>,
+                column: TableColumn<DTO, LocalDate>
+            ) {
+                column.cellFactory = DatePickerTableCell.forTableColumn()
+            }
+
+            override fun handleSelectedStringColumn(
+                property: KProperty1<DTO, SelectedProperty<AbstractDto, String>>,
+                column: TableColumn<DTO, String>
+            ) {
+
+            }
+
+            override fun handleSelectedNumberColumn(
+                property: KProperty1<DTO, SelectedProperty<AbstractDto, Number>>,
+                column: TableColumn<DTO, Number>
+            ) {
+
+            }
+
+
+        })
+
+        tableView.columnResizePolicy = SmartResize.POLICY
+        tableView.isEditable = true
         tableView.items = controller.dataList
+        tableView.enableCellEditing()
+        tableView.enableDirtyTracking()
+        tableView.addColumnInternal(buildDeleteColumn())
     }
 
-    private fun initEditableFieldSet() {
-        editCellFieldset = fieldset {}
-        fieldSetPane.add(
-            form { add(editCellFieldset) }
-        )
+    private fun buildDeleteColumn(): TableColumn<DTO, DTO> {
+        val deleteColumn = TableColumn<DTO, DTO>("")
+        deleteColumn.setCellValueFactory {
+            ReadOnlyObjectWrapper(it.value)
+        }
+        deleteColumn.minWidth = 70.0
+        deleteColumn.cellFormat {
+            val deleteButton = Button("X")
+            deleteButton.prefWidth = 50.0
+            deleteButton.style { textFill = Color.DARKRED }
+            deleteButton.action { onClickDeleteButton(tableRow) }
 
-        saveButton.enableWhen(viewmodel.dirty)
-        saveButton.action { save() }
-        resetButton.action { viewmodel.rollback() }
+            graphic = deleteButton
+            minHeight = 50.0
+            style { alignment = Pos.CENTER }
+        }
+        return deleteColumn
+    }
+
+    private fun onClickDeleteButton(tableRow: TableRow<DTO>) {
+        tableRow.style {
+            //backgroundColor += Color.GRAY
+        }
+        //controller.dataList.remove(tableRow.item)
     }
 
     private fun initPagination() {
@@ -160,103 +173,87 @@ abstract class AbstractTableView<DTO : AbstractDto, VM : AbstractItemViewModel<D
     }
 
     private fun save() {
-        // Flush changes from the text fields into the model
-        viewmodel.commit()
-
-        // The edited person is contained in the model
-        val person = viewmodel.item
 
         // A real application would persist the person here
         println("Saving ")// )/// ${person.machineryType!!.name}")
     }
-
-    private fun <S, T> TableView<S>.column(
-        title: String,
-        prop: KProperty1<S, ObservableValue<T>>,
-        op: TableColumn<S, T>.() -> Unit = {}
-    ): TableColumn<S, T> {
-        val column = TableColumn<S, T>(title)
-        column.cellValueFactory = Callback { prop.call(it.value) }
-        addColumnInternal(column)
-        return column.also(op)
-    }
 }
 
-class MachineryModelView : AbstractTableView<MachineryModel, MachineryModelViewModel, MachineryModelController>(
+class MachineryModelView : AbstractTableView<MachineryModel, MachineryModelController>(
     "Модели строительной техники",
     MachineryModelController()
 )
 
 class BrigadeMemberView :
-    AbstractTableView<BrigadeMember, BrigadeMemberViewModel, BrigadeMemberController>("", BrigadeMemberController())
+    AbstractTableView<BrigadeMember, BrigadeMemberController>("", BrigadeMemberController())
 
 
-class BrigadeView : AbstractTableView<Brigade, BrigadeViewModel, BrigadeController>("", BrigadeController())
+class BrigadeView : AbstractTableView<Brigade, BrigadeController>("", BrigadeController())
 
 
 class BuildObjectView :
-    AbstractTableView<BuildObject, BuildObjectViewModel, BuildObjectController>("", BuildObjectController())
+    AbstractTableView<BuildObject, BuildObjectController>("", BuildObjectController())
 
 
-class CustomerView : AbstractTableView<Customer, CustomerViewModel, CustomerController>("", CustomerController())
+class CustomerView : AbstractTableView<Customer, CustomerController>("", CustomerController())
 
 
-class EstimateView : AbstractTableView<Estimate, EstimateViewModel, EstimateController>("", EstimateController())
+class EstimateView : AbstractTableView<Estimate, EstimateController>("", EstimateController())
 
 
-class MachineryView : AbstractTableView<Machinery, MachineryViewModel, MachineryController>("", MachineryController())
+class MachineryView : AbstractTableView<Machinery, MachineryController>("", MachineryController())
 
 
 class MachineryTypeView :
-    AbstractTableView<MachineryType, MachineryTypeViewModel, MachineryTypeController>("", MachineryTypeController())
+    AbstractTableView<MachineryType, MachineryTypeController>("", MachineryTypeController())
 
 
 class ManagementView :
-    AbstractTableView<Management, ManagementViewModel, ManagementController>("", ManagementController())
+    AbstractTableView<Management, ManagementController>("", ManagementController())
 
 
-class MaterialView : AbstractTableView<Material, MaterialViewModel, MaterialController>("", MaterialController())
+class MaterialView : AbstractTableView<Material, MaterialController>("", MaterialController())
 
 
 class MaterialConsumptionView :
-    AbstractTableView<MaterialConsumption, MaterialConsumptionViewModel, MaterialConsumptionController>(
+    AbstractTableView<MaterialConsumption, MaterialConsumptionController>(
         "",
         MaterialConsumptionController()
     )
 
 
 class ObjectBrigadeView :
-    AbstractTableView<ObjectBrigade, ObjectBrigadeViewModel, ObjectBrigadeController>("", ObjectBrigadeController())
+    AbstractTableView<ObjectBrigade, ObjectBrigadeController>("", ObjectBrigadeController())
 
 
-class ObjectMachineryView : AbstractTableView<ObjectMachinery, ObjectMachineryViewModel, ObjectMachineryController>(
+class ObjectMachineryView : AbstractTableView<ObjectMachinery, ObjectMachineryController>(
     "",
     ObjectMachineryController()
 )
 
 
-class PlotView : AbstractTableView<Plot, PlotViewModel, PlotController>("", PlotController())
+class PlotView : AbstractTableView<Plot, PlotController>("", PlotController())
 
 
-class PrototypeView : AbstractTableView<Prototype, PrototypeViewModel, PrototypeController>("", PrototypeController())
+class PrototypeView : AbstractTableView<Prototype, PrototypeController>("", PrototypeController())
 
 
 class PrototypeTypeView :
-    AbstractTableView<PrototypeType, PrototypeTypeViewModel, PrototypeTypeController>("", PrototypeTypeController())
+    AbstractTableView<PrototypeType, PrototypeTypeController>("", PrototypeTypeController())
 
 
-class StaffView : AbstractTableView<Staff, StaffViewModel, StaffController>("", StaffController())
+class StaffView : AbstractTableView<Staff, StaffController>("", StaffController())
 
 
-class TitleView : AbstractTableView<Title, TitleViewModel, TitleController>("", TitleController())
+class TitleView : AbstractTableView<Title, TitleController>("", TitleController())
 
 
 class TitleCategoryView :
-    AbstractTableView<TitleCategory, TitleCategoryViewModel, TitleCategoryController>("", TitleCategoryController())
+    AbstractTableView<TitleCategory, TitleCategoryController>("", TitleCategoryController())
 
 
 class WorkScheduleView :
-    AbstractTableView<WorkSchedule, WorkScheduleViewModel, WorkScheduleController>("", WorkScheduleController())
+    AbstractTableView<WorkSchedule, WorkScheduleController>("", WorkScheduleController())
 
 
-class WorkTypeView : AbstractTableView<WorkType, WorkTypeViewModel, WorkTypeController>("", WorkTypeController())
+class WorkTypeView : AbstractTableView<WorkType, WorkTypeController>("", WorkTypeController())

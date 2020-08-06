@@ -2,14 +2,12 @@ package com.example.ConstructionCompanyApplication.ui.controller
 
 import com.example.ConstructionCompanyApplication.dto.*
 import com.example.ConstructionCompanyApplication.service.*
-import com.example.ConstructionCompanyApplication.ui.viewmodel.*
 import org.springframework.data.domain.Pageable
 import org.springframework.hateoas.Link
 import org.springframework.hateoas.Links
 import tornadofx.*
 
-abstract class AbstractController<DTO : AbstractDto, VM : AbstractItemViewModel<DTO>, S : AbstractService<*, DTO>>(
-    val model: VM,
+abstract class AbstractController<DTO : AbstractDto, S : AbstractService<*, DTO>>(
     private val service: S
 ) : Controller() {
 
@@ -26,7 +24,7 @@ abstract class AbstractController<DTO : AbstractDto, VM : AbstractItemViewModel<
         itemRelatedLinksMap.clear()
         itemRelatedLinksMap.putAll(result.content.map { entityModel ->
             entityModel.content to toLinkInfoList(entityModel.links)
-        }.toMap() as Map<DTO, List<AbstractController.LinkInfo>>)
+        }.toMap() as Map<DTO, List<LinkInfo>>)
         tableRelatedLinksList.setAll(toLinkInfoList(result.links))
         return PageInfo(result.metadata!!.totalElements, result.metadata!!.totalPages)
     }
@@ -62,104 +60,104 @@ abstract class AbstractController<DTO : AbstractDto, VM : AbstractItemViewModel<
     class PageInfo(val totalElements: Long, val totalPages: Long)
 }
 
-class MachineryModelController : AbstractController<MachineryModel, MachineryModelViewModel, MachineryModelService>(
-    MachineryModelViewModel(),
+class MachineryModelController : AbstractController<MachineryModel, MachineryModelService>(
+
     MachineryModelService()
 )
 
-class BrigadeMemberController : AbstractController<BrigadeMember, BrigadeMemberViewModel, BrigadeMemberService>(
-    BrigadeMemberViewModel(),
+class BrigadeMemberController : AbstractController<BrigadeMember, BrigadeMemberService>(
+
     BrigadeMemberService()
 )
 
 
 class BrigadeController :
-    AbstractController<Brigade, BrigadeViewModel, BrigadeService>(BrigadeViewModel(), BrigadeService())
+    AbstractController<Brigade, BrigadeService>(BrigadeService())
 
 
-class BuildObjectController : AbstractController<BuildObject, BuildObjectViewModel, BuildObjectService>(
-    BuildObjectViewModel(),
+class BuildObjectController : AbstractController<BuildObject, BuildObjectService>(
+
     BuildObjectService()
 )
 
 
 class CustomerController :
-    AbstractController<Customer, CustomerViewModel, CustomerService>(CustomerViewModel(), CustomerService())
+    AbstractController<Customer, CustomerService>(CustomerService())
 
 
 class EstimateController :
-    AbstractController<Estimate, EstimateViewModel, EstimateService>(EstimateViewModel(), EstimateService())
+    AbstractController<Estimate, EstimateService>(EstimateService())
 
 
 class MachineryController :
-    AbstractController<Machinery, MachineryViewModel, MachineryService>(MachineryViewModel(), MachineryService())
+    AbstractController<Machinery, MachineryService>(MachineryService())
 
 
-class MachineryTypeController : AbstractController<MachineryType, MachineryTypeViewModel, MachineryTypeService>(
-    MachineryTypeViewModel(),
+class MachineryTypeController : AbstractController<MachineryType, MachineryTypeService>(
+
     MachineryTypeService()
 )
 
 
 class ManagementController :
-    AbstractController<Management, ManagementViewModel, ManagementService>(ManagementViewModel(), ManagementService())
+    AbstractController<Management, ManagementService>(ManagementService())
 
 
 class MaterialController :
-    AbstractController<Material, MaterialViewModel, MaterialService>(MaterialViewModel(), MaterialService())
+    AbstractController<Material, MaterialService>(MaterialService())
 
 
 class MaterialConsumptionController :
-    AbstractController<MaterialConsumption, MaterialConsumptionViewModel, MaterialConsumptionService>(
-        MaterialConsumptionViewModel(),
+    AbstractController<MaterialConsumption, MaterialConsumptionService>(
+
         MaterialConsumptionService()
     )
 
 
-class ObjectBrigadeController : AbstractController<ObjectBrigade, ObjectBrigadeViewModel, ObjectBrigadeService>(
-    ObjectBrigadeViewModel(),
+class ObjectBrigadeController : AbstractController<ObjectBrigade, ObjectBrigadeService>(
+
     ObjectBrigadeService()
 )
 
 
-class ObjectMachineryController : AbstractController<ObjectMachinery, ObjectMachineryViewModel, ObjectMachineryService>(
-    ObjectMachineryViewModel(),
+class ObjectMachineryController : AbstractController<ObjectMachinery, ObjectMachineryService>(
+
     ObjectMachineryService()
 )
 
 
-class PlotController : AbstractController<Plot, PlotViewModel, PlotService>(PlotViewModel(), PlotService())
+class PlotController : AbstractController<Plot, PlotService>(PlotService())
 
 
 class PrototypeController :
-    AbstractController<Prototype, PrototypeViewModel, PrototypeService>(PrototypeViewModel(), PrototypeService())
+    AbstractController<Prototype, PrototypeService>(PrototypeService())
 
 
-class PrototypeTypeController : AbstractController<PrototypeType, PrototypeTypeViewModel, PrototypeTypeService>(
-    PrototypeTypeViewModel(),
+class PrototypeTypeController : AbstractController<PrototypeType, PrototypeTypeService>(
+
     PrototypeTypeService()
 )
 
 
-class StaffController : AbstractController<Staff, StaffViewModel, StaffService>(StaffViewModel(), StaffService())
+class StaffController : AbstractController<Staff, StaffService>(StaffService())
 
 
-class TitleController : AbstractController<Title, TitleViewModel, TitleService>(TitleViewModel(), TitleService())
+class TitleController : AbstractController<Title, TitleService>(TitleService())
 
 
-class TitleCategoryController : AbstractController<TitleCategory, TitleCategoryViewModel, TitleCategoryService>(
-    TitleCategoryViewModel(),
+class TitleCategoryController : AbstractController<TitleCategory, TitleCategoryService>(
+
     TitleCategoryService()
 )
 
 
-class WorkScheduleController : AbstractController<WorkSchedule, WorkScheduleViewModel, WorkScheduleService>(
-    WorkScheduleViewModel(),
+class WorkScheduleController : AbstractController<WorkSchedule, WorkScheduleService>(
+
     WorkScheduleService()
 )
 
 
 class WorkTypeController :
-    AbstractController<WorkType, WorkTypeViewModel, WorkTypeService>(WorkTypeViewModel(), WorkTypeService())
+    AbstractController<WorkType, WorkTypeService>(WorkTypeService())
 
 

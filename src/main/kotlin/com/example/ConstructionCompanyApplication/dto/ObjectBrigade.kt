@@ -6,8 +6,8 @@ import tornadofx.*
 import java.time.LocalDate
 
 class ObjectBrigade(
-    startDate: LocalDate? = null,
-    finishDate: LocalDate? = null,
+    startDate: LocalDate = LocalDate.now(),
+    finishDate: LocalDate = LocalDate.now(),
     brigade: Brigade = Brigade(),
     buildObject: BuildObject = BuildObject(),
     workSchedule: WorkSchedule = WorkSchedule(),

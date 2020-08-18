@@ -1,40 +1,20 @@
 package com.example.ConstructionCompanyApplication.dto
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
-import tornadofx.*
 
 class WorkSchedule(
-    ord: Int = 0,
-    deadline: Int = 0,
-    prototype: Prototype = Prototype(),
-    workType: WorkType = WorkType(),
+    ord: Int? = null,
+    deadline: Int? = null,
+    prototype: Prototype? = null,
+    workType: WorkType? = null,
     id: Long? = null
-) : AbstractDto(id) {
-    @JsonIgnore
-    @ColumnName("Порядок выполнения")
-    val ordProperty = SimpleIntegerProperty(ord)
-    var ord by ordProperty
+) : AbstractEntity(id) {
+    val ord = SimpleObjectProperty<Int>(ord)
+    val deadline = SimpleObjectProperty<Int>(deadline)
+    val prototype = SimpleObjectProperty<Prototype>(prototype)
+    val workType = SimpleObjectProperty<WorkType>(workType)
 
-    @JsonIgnore
-    @ColumnName("Срок выполнения")
-    val deadlineProperty = SimpleIntegerProperty(deadline)
-    var deadline by deadlineProperty
-
-    @JsonIgnore
-    val prototypeProperty = SimpleObjectProperty<Prototype>(prototype)
-    var prototype by prototypeProperty
-
-    @JsonIgnore
-    val workTypeProperty = SimpleObjectProperty<WorkType>(workType)
-    var workType by workTypeProperty
-
-    @JsonIgnore
-    @ColumnName("Вид работ")
-    val workTypeNameProperty = workTypeProperty.select(WorkType::nameProperty)
-
-    @JsonIgnore
-    @ColumnName("Прототип")
-    val prototypeIdProperty = prototypeProperty.select(Prototype::idProperty)
+    override fun toString(): String {
+        return toWordSequence(ord, workType)
+    }
 }

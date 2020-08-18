@@ -1,35 +1,19 @@
 package com.example.ConstructionCompanyApplication.dto
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
-import tornadofx.*
 
 class Estimate(
-    amount: Int = 0,
-    workSchedule: WorkSchedule = WorkSchedule(),
-    material: Material = Material(),
+    amount: Int? = null,
+    workSchedule: WorkSchedule? = null,
+    material: Material? = null,
     id: Long? = null
-) : AbstractDto(id) {
-    @JsonIgnore
-    @ColumnName("Количество")
-    val amountProperty = SimpleIntegerProperty(amount)
-    var amount by amountProperty
+) : AbstractEntity(id) {
 
-    @JsonIgnore
-    val workScheduleProperty = SimpleObjectProperty<WorkSchedule>(workSchedule)
-    var workSchedule by workScheduleProperty
+    val amount = SimpleObjectProperty<Int>(amount)
+    val workSchedule = SimpleObjectProperty<WorkSchedule>(workSchedule)
+    val material = SimpleObjectProperty<Material>(material)
 
-    @JsonIgnore
-    val materialProperty = SimpleObjectProperty<Material>(material)
-    var material by materialProperty
-
-    @JsonIgnore
-    @ColumnName("График работ")
-    val workScheduleIdProperty = workScheduleProperty.select(WorkSchedule::workTypeNameProperty)
-
-    @JsonIgnore
-    @ColumnName("Материал")
-    val materialNameProperty = materialProperty.select(Material::nameProperty)
-
+    override fun toString(): String {
+        return toWordSequence(amount, material)
+    }
 }

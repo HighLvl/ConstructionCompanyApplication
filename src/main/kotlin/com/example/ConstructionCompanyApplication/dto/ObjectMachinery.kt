@@ -1,41 +1,22 @@
 package com.example.ConstructionCompanyApplication.dto
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javafx.beans.property.SimpleObjectProperty
-import tornadofx.*
 import java.time.LocalDate
 
 class ObjectMachinery(
     startDate: LocalDate? = null,
     finishDate: LocalDate? = null,
-    buildObject: BuildObject = BuildObject(),
-    machinery: Machinery = Machinery(),
+    buildObject: BuildObject? = null,
+    machinery: Machinery? = null,
     id: Long? = null
-) : AbstractDto(id) {
-    @JsonIgnore
-    @ColumnName("Начало работы")
-    val startDateProperty = SimpleObjectProperty<LocalDate>(startDate)
-    var startDate by startDateProperty
+) : AbstractEntity(id) {
 
-    @JsonIgnore
-    @ColumnName("Конец работы")
-    val finishDateProperty = SimpleObjectProperty<LocalDate>(finishDate)
-    var finishDate by finishDateProperty
+    val startDate = SimpleObjectProperty<LocalDate>(startDate)
+    val finishDate = SimpleObjectProperty<LocalDate>(finishDate)
+    val buildObject = SimpleObjectProperty<BuildObject>(buildObject)
+    val machinery = SimpleObjectProperty<Machinery>(machinery)
 
-    @JsonIgnore
-    val buildObjectProperty = SimpleObjectProperty<BuildObject>(buildObject)
-    var buildObject by buildObjectProperty
-
-    @JsonIgnore
-    val machineryProperty = SimpleObjectProperty<Machinery>(machinery)
-    var machinery by machineryProperty
-
-    @JsonIgnore
-    @ColumnName("Объект строительства")
-    val BuildObjectIdProperty = buildObjectProperty.select(BuildObject::idProperty)
-
-    @JsonIgnore
-    @ColumnName("Строительная техника")
-    val machineryModelProperty = machineryProperty.select(Machinery::modelNameProperty)
-
+    override fun toString(): String {
+        return toWordSequence(buildObject, machinery)
+    }
 }

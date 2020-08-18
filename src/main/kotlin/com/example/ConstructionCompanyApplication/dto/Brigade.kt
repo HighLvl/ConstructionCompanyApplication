@@ -1,26 +1,20 @@
 package com.example.ConstructionCompanyApplication.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.SimpleObjectIdResolver
 import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
 
 class Brigade(
     name: String? = null,
-    title: Title = Title(),
+    title: Title? = null,
     id: Long? = null
-) : AbstractDto(id) {
-    @JsonIgnore
-    @ColumnName("Название")
-    val nameProperty = SimpleStringProperty(name)
-    var name by nameProperty
+) : AbstractEntity(id) {
+    val name = SimpleObjectProperty<String>(name)
+    val title = SimpleObjectProperty<Title>(title)
 
-    @JsonIgnore
-    val titleProperty = SimpleObjectProperty<Title>(title)
-    var title by titleProperty
+    override fun toString(): String {
+        return name.value.orEmpty()
+    }
 
-    @JsonIgnore
-    @ColumnName("Должность рабочих")
-    val titleNameProperty = titleProperty.select(Title::nameProperty)
+
 }

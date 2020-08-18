@@ -1,16 +1,14 @@
 package com.example.ConstructionCompanyApplication.dto
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import javafx.beans.property.SimpleStringProperty
-import tornadofx.*
+import javafx.beans.property.SimpleObjectProperty
 
 class WorkType(
     name: String? = null,
     id: Long? = null
-) : AbstractDto(id) {
-    @JsonIgnore
-    @ColumnName("Название")
-    val nameProperty = SimpleStringProperty()
-    var name by nameProperty
+) : AbstractEntity(id) {
+    val name = SimpleObjectProperty<String>(name)
 
+    override fun toString(): String {
+        return name.value.orEmpty()
+    }
 }

@@ -1,28 +1,16 @@
 package com.example.ConstructionCompanyApplication.dto
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javafx.beans.property.SimpleObjectProperty
-import tornadofx.getValue
-import tornadofx.setValue
 
 class Machinery(
-    model: MachineryModel = MachineryModel(),
-    management: Management = Management(),
+    model: MachineryModel? = null,
+    management: Management? = null,
     id: Long? = null
-) : AbstractDto(id) {
-    @JsonIgnore
-    val modelProperty = SimpleObjectProperty<MachineryModel>(model)
-    var model by modelProperty
-    @JsonIgnore
-    val managementProperty = SimpleObjectProperty<Management>(management)
-    var management by managementProperty
+) : AbstractEntity(id) {
+    val model = SimpleObjectProperty<MachineryModel>(model)
+    val management = SimpleObjectProperty<Management>(management)
 
-    @JsonIgnore
-    @ColumnName("Модель")
-    val modelNameProperty = modelProperty.select(MachineryModel::nameProperty)
-
-    @JsonIgnore
-    @ColumnName("Строительное управление")
-    val managementIdProperty = managementProperty.select(Management::idProperty)
-
+    override fun toString(): String {
+        return toWordSequence(id, model)
+    }
 }

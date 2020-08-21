@@ -1,11 +1,13 @@
-package com.example.ConstructionCompanyApplication.ui.controller
+package com.example.ConstructionCompanyApplication.controller
 
-import com.example.ConstructionCompanyApplication.dto.*
-import com.example.ConstructionCompanyApplication.service.*
+import com.example.ConstructionCompanyApplication.dto.AbstractEntity
+import com.example.ConstructionCompanyApplication.service.CommonService
 import javafx.collections.ObservableList
 import org.springframework.data.domain.Pageable
+import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.Link
 import org.springframework.hateoas.Links
+import org.springframework.hateoas.PagedModel
 import tornadofx.*
 import kotlin.reflect.KClass
 
@@ -13,14 +15,23 @@ class CommonController<T : AbstractEntity>(entityClass: KClass<T>) : Controller(
     val dataList = observableListOf<T>()
     val itemRelatedLinksMap = observableMapOf<T, ObservableList<LinkInfo>>()
     val tableRelatedLinksList = observableListOf<LinkInfo>()
+    var filter: String = ""
 
     private val service = CommonService(entityClass)
 
-    @Suppress("UNCHECKED_CAST")
     fun loadAll(pageable: Pageable, url: String = ""): PageInfo {
+        val result = if (filter.isEmpty())
+            if (url.isEmpty()) service.getAll(pageable) else service.get(url, pageable)
+        else
+            service.findByRsql(pageable, filter)
+
+        return updateDataWith(result)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun updateDataWith(result: PagedModel<EntityModel<T>>?): PageInfo {
         fun toLinkInfoList(links: Links) = links.toList().mapNotNull { toLinkInfo(it) }.asObservable()
 
-        val result = if (url.isEmpty()) service.getAll(pageable) else service.get(url, pageable)
         dataList.setAll(result?.content!!.map { it.content!! } as MutableCollection<T>)
 
         itemRelatedLinksMap.clear()
@@ -38,7 +49,7 @@ class CommonController<T : AbstractEntity>(entityClass: KClass<T>) : Controller(
     }
 
     fun saveAll(collection: Collection<T>) {
-        if(collection.isEmpty()) return
+        if (collection.isEmpty()) return
         service.saveAll(collection)
     }
 
@@ -66,7 +77,6 @@ class CommonController<T : AbstractEntity>(entityClass: KClass<T>) : Controller(
         endpoint = Regex("/\\w+").findAll(url).elementAt(1).value
         return LinkInfo(propertyName, url, endpoint, isReferred)
     }
-
 
 
     class LinkInfo(val propertyName: String, val url: String, val endpoint: String, val isReferred: Boolean)

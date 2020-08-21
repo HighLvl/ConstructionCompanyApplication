@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -40,6 +39,9 @@
                            </children>
                         </AnchorPane>
                      </children>
+                     <VBox.margin>
+                        <Insets top="7.0" />
+                     </VBox.margin>
                   </HBox>
                   <AnchorPane maxHeight="1.7976931348623157E308" prefHeight="1080.0">
                      <children>
@@ -76,16 +78,30 @@
                      </children>
                   </AnchorPane>
                </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
             </VBox>
          </children>
       </AnchorPane>
    </center>
    <right>
-      <AnchorPane minWidth="-Infinity" prefHeight="529.0" prefWidth="348.0" BorderPane.alignment="CENTER">
+      <AnchorPane minWidth="-Infinity" prefHeight="529.0" prefWidth="400.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="-2.0" prefHeight="529.0" prefWidth="400.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-2.0">
+            <VBox fx:id="rightVBox" alignment="TOP_CENTER" layoutX="14.0" layoutY="-2.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="529.0" prefWidth="400.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Button fx:id="addElementButton" alignment="CENTER" minHeight="-Infinity" mnemonicParsing="false" prefHeight="42.0" prefWidth="286.0" text="Добавить записи" />
+                  <AnchorPane>
+                     <children>
+                        <Accordion fx:id="filterAccordion" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0">
+                          <panes>
+                            <TitledPane fx:id="filterPane" animated="false" text="Фильтр" />
+                          </panes>
+                           <padding>
+                              <Insets bottom="7.0" top="7.0" />
+                           </padding>
+                        </Accordion>
+                     </children>
+                  </AnchorPane>
                   <Label alignment="CENTER" prefHeight="26.0" prefWidth="184.0" text="Ссылаемые таблицы">
                      <font>
                         <Font name="System Bold" size="16.0" />
@@ -112,9 +128,14 @@
                         <ListView fx:id="referencingListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
+                  <Button fx:id="addElementButton" alignment="CENTER" minHeight="-Infinity" mnemonicParsing="false" prefHeight="42.0" prefWidth="286.0" text="Добавить записи">
+                     <VBox.margin>
+                        <Insets top="7.0" />
+                     </VBox.margin>
+                  </Button>
                   <Button fx:id="refreshButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="42.0" prefWidth="286.0" text="Обновить">
                      <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
+                        <Insets bottom="5.0" top="7.0" />
                      </VBox.margin>
                   </Button>
                </children>
@@ -128,15 +149,4 @@
    <bottom>
       <VBox fx:id="topVBox" BorderPane.alignment="CENTER" />
    </bottom>
-   <top>
-      <GridPane fx:id="filterGridPane" BorderPane.alignment="CENTER">
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-      </GridPane>
-   </top>
 </BorderPane>

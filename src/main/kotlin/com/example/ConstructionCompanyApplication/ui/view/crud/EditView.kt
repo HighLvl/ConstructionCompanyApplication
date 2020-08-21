@@ -3,17 +3,14 @@ package com.example.ConstructionCompanyApplication.ui.view.crud
 import com.example.ConstructionCompanyApplication.dto.AbstractEntity
 import com.example.ConstructionCompanyApplication.service.EntityEndpointMapper
 import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
-import com.example.ConstructionCompanyApplication.ui.controller.CommonController
-import com.example.ConstructionCompanyApplication.ui.view.DeleteTableColumn
-import com.example.ConstructionCompanyApplication.ui.view.EntityTableView
-import com.example.ConstructionCompanyApplication.ui.view.MainTabPane
-import com.example.ConstructionCompanyApplication.ui.view.SortBox
+import com.example.ConstructionCompanyApplication.controller.CommonController
+import com.example.ConstructionCompanyApplication.ui.view.*
+import com.example.ConstructionCompanyApplication.ui.view.filter.FilterView
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import org.springframework.data.domain.PageRequest
 import tornadofx.*
@@ -25,7 +22,7 @@ import kotlin.reflect.KProperty1
 
 @Suppress("UNCHECKED_CAST")
 class EditView<T : AbstractEntity>(
-    entityClass: KClass<T>
+    private val entityClass: KClass<T>
 ) : View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {
     override val root: BorderPane by fxml("/view/EditableTable.fxml")
     private val pageSizeMenu: MenuButton by fxid()
@@ -35,7 +32,6 @@ class EditView<T : AbstractEntity>(
     private val addElementButton: Button by fxid()
     private val referrerListView: ListView<CommonController.LinkInfo> by fxid()
     private val referencingListView: ListView<CommonController.LinkInfo> by fxid()
-    private val filterGridPane: GridPane by fxid()
     private val pagination: Pagination by fxid()
     private val totalElementsLabel: Label by fxid()
     private val saveButton: Button by fxid()
@@ -43,6 +39,7 @@ class EditView<T : AbstractEntity>(
     private val showAllButton: Button by fxid()
     private val refreshButton: Button by fxid()
     private val topVBox: VBox by fxid()
+    private val filterPane: TitledPane by fxid()
 
     private val tableView = EntityConfigurationProvider.get(entityClass).tableViewFactory.create() as EntityTableView<T>
     private val controller = CommonController(entityClass)
@@ -54,15 +51,16 @@ class EditView<T : AbstractEntity>(
 
     private var tableViewEditModel: TableViewEditModel<T> by singleAssign()
 
-    private val tableViewPagination = EntityTableViewPagination(
-        pagination,
-        tableView,
-        pageSizeMenu,
-        pageSize25,
-        pageSize50,
-        pageSize100,
-        totalElementsLabel
-    )
+    private val tableViewPagination =
+        EntityTableViewPagination(
+            pagination,
+            tableView,
+            pageSizeMenu,
+            pageSize25,
+            pageSize50,
+            pageSize100,
+            totalElementsLabel
+        )
     private val sortBox = SortBox(tableView)
 
     init {
@@ -74,6 +72,17 @@ class EditView<T : AbstractEntity>(
         initShowAllButton()
         initRefreshButton()
         initSortBox()
+        initFilterPane()
+    }
+
+    private fun initFilterPane() {
+        val filterViewFactory = EntityConfigurationProvider.get(entityClass).filterViewFactory ?: return
+        val filterView = filterViewFactory.create()
+        filterView.onSearchRequest = {
+            controller.filter = it
+            tableViewPagination.loadPage(0)
+        }
+        filterPane.add(filterView)
     }
 
     private fun initRefreshButton() {
@@ -113,6 +122,7 @@ class EditView<T : AbstractEntity>(
                         addElementButton.text = "Добавить записи"
                         refreshButton.isVisible = true
                         sortBox.isVisible = true
+                        filterPane.isVisible = true
                         add(editNode)
                         ViewState.EDIT
                     }
@@ -120,6 +130,7 @@ class EditView<T : AbstractEntity>(
                         addElementButton.text = "Редактировать таблицу"
                         refreshButton.isVisible = false
                         sortBox.isVisible = false
+                        filterPane.isVisible = false
                         add(createView)
                         ViewState.CREATE
                     }

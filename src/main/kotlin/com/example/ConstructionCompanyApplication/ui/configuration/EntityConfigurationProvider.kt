@@ -2,6 +2,7 @@ package com.example.ConstructionCompanyApplication.ui.configuration
 
 import com.example.ConstructionCompanyApplication.dto.*
 import com.example.ConstructionCompanyApplication.ui.view.*
+import com.example.ConstructionCompanyApplication.ui.view.filter.BuildObjectFilterViewFactory
 import kotlin.reflect.KClass
 
 object EntityConfigurationProvider {
@@ -23,7 +24,10 @@ object EntityConfigurationProvider {
         ),
         BuildObject::class to EntityConfiguration(
             BuildObjectTableViewFactory(),
-            EntityMetadata("Строительный объект", listOf(BuildObject::prototype, BuildObject::id))
+            EntityMetadata(
+                "Строительный объект", listOf(BuildObject::prototype, BuildObject::id)
+            ),
+            BuildObjectFilterViewFactory()
         ),
         Customer::class to EntityConfiguration(
             CustomerTableViewFactory(),
@@ -106,7 +110,12 @@ object EntityConfigurationProvider {
         "Сотрудники" to listOf(Staff::class, Title::class, TitleCategory::class),
         "Заказчики" to listOf(Customer::class),
         "Бригады" to listOf(Brigade::class, BrigadeMember::class, ObjectBrigade::class),
-        "Строительные работы" to listOf(WorkType::class, WorkSchedule::class, Estimate::class, MaterialConsumption::class),
+        "Строительные работы" to listOf(
+            WorkType::class,
+            WorkSchedule::class,
+            Estimate::class,
+            MaterialConsumption::class
+        ),
         "Объекты строительства" to listOf(BuildObject::class, Prototype::class, PrototypeType::class),
         "Строительные управления" to listOf(Management::class, Plot::class),
         "Строительная техника" to listOf(

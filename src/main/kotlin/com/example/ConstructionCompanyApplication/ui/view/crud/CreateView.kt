@@ -2,7 +2,7 @@ package com.example.ConstructionCompanyApplication.ui.view.crud
 
 import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
 import com.example.ConstructionCompanyApplication.dto.AbstractEntity
-import com.example.ConstructionCompanyApplication.ui.controller.CommonController
+import com.example.ConstructionCompanyApplication.controller.CommonController
 import com.example.ConstructionCompanyApplication.ui.view.DeleteTableColumn
 import com.example.ConstructionCompanyApplication.ui.view.EntityTableView
 import javafx.beans.property.ObjectProperty

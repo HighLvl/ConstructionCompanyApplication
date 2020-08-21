@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -67,23 +66,26 @@
                </children>
             </VBox>
          </children>
+         <BorderPane.margin>
+            <Insets top="7.0" />
+         </BorderPane.margin>
       </AnchorPane>
    </center>
-   <top>
-      <GridPane fx:id="filterGridPane" BorderPane.alignment="CENTER">
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-      </GridPane>
-   </top>
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
    <bottom>
       <HBox fx:id="sortHBox" BorderPane.alignment="CENTER" />
    </bottom>
+   <top>
+      <Accordion BorderPane.alignment="TOP_LEFT">
+        <panes>
+          <TitledPane animated="false" text="Фильтр">
+               <content>
+                  <AnchorPane fx:id="filterPane" />
+               </content>
+            </TitledPane>
+        </panes>
+      </Accordion>
+   </top>
 </BorderPane>

@@ -1,10 +1,7 @@
-package com.example.ConstructionCompanyApplication.ui.view.crud
+package com.example.ConstructionCompanyApplication.ui.view
 
-import com.example.ConstructionCompanyApplication.ui.controller.CommonController
-import com.example.ConstructionCompanyApplication.ui.view.EntityTableView
-import com.example.ConstructionCompanyApplication.ui.view.SortBox
+import com.example.ConstructionCompanyApplication.controller.CommonController
 import javafx.scene.control.*
-import org.springframework.data.domain.PageRequest
 import tornadofx.*
 
 class EntityTableViewPagination(

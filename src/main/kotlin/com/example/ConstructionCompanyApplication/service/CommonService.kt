@@ -81,25 +81,15 @@ class CommonService<T : AbstractEntity>(private val dtoClass: KClass<T>) : APICo
         return mapToDto(response.body()?.string())
     }
 
-    fun deleteById(id: Long): Boolean {
-        val call = repository.deleteById(id)
-        val response = call.execute()
-        if (!response.isSuccessful) {
-            throw IOException(if (response.errorBody() != null) response.errorBody()!!.string() else "Unknown error")
-        }
-        return true
-    }
-
-    fun save(entity: T): T? {
-        val requestBody = toRequestBody(entity)
-        val call = repository.save(requestBody)
+    fun findByRsql(pageable: Pageable, filter: String): PagedModel<EntityModel<T>>? {
+        val pageableQuery = convertPageableToQuery(pageable)
+        val call = repository.findByRsql(filter, pageableQuery.first, pageableQuery.second)
         val response = call.execute()
         if (!response.isSuccessful) {
             throw IOException(if (response.errorBody() != null) response.errorBody()!!.string() else "Unknown error")
         }
 
-        val modelType = typeFactory.constructType(dtoClass.java)
-        return objectMapper.readValue(response.body()?.string(), modelType) as T?
+        return mapToDto(response.body()?.string())
     }
 
     private fun mapToDto(responseBodyString: String?): PagedModel<EntityModel<T>>? {
@@ -121,9 +111,6 @@ class CommonService<T : AbstractEntity>(private val dtoClass: KClass<T>) : APICo
         }
         return Pair(mapOf("page" to pageable.pageNumber, "size" to pageable.pageSize), sortList)
     }
-
-    private fun toRequestBody(dto: AbstractEntity) =
-        RequestBody.create(MediaType.get("application/json"), objectMapper.writeValueAsString(dto))
 
     private fun toRequestBody(collection: Collection<AbstractEntity>) =
         RequestBody.create(MediaType.get("application/json"), objectMapper.writeValueAsString(collection))

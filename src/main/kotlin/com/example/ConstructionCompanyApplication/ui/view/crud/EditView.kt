@@ -8,15 +8,16 @@ import com.example.ConstructionCompanyApplication.ui.view.*
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Node
+import javafx.scene.Parent
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.util.converter.LongStringConverter
 import org.springframework.data.domain.PageRequest
 import tornadofx.*
 import tornadofx.control.DatePickerTableCell
-import java.lang.NumberFormatException
 import java.time.LocalDate
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -26,7 +27,8 @@ import kotlin.reflect.KProperty1
 class EditView<T : AbstractEntity>(
     private val entityClass: KClass<T>
 ) : View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {
-    override val root: BorderPane by fxml("/view/EditableTable.fxml")
+    override val root: StackPane by fxml("/view/EditableTable.fxml")
+    private val borderPane: BorderPane by fxid()
     private val pageSizeMenu: MenuButton by fxid()
     private val pageSize25: MenuItem by fxid()
     private val pageSize50: MenuItem by fxid()
@@ -111,14 +113,14 @@ class EditView<T : AbstractEntity>(
         dataSourceUrlProperty.set(url)
     }
 
-    private val editNode: Node = root.center.getChildList()!![0]
+    private val editNode: Node = borderPane.center.getChildList()!![0]
 
     private enum class ViewState { EDIT, CREATE }
 
     private var viewState = ViewState.EDIT
     private fun initAddElementsButton() {
         addElementButton.action {
-            root.center {
+            borderPane.center {
                 viewState = when (viewState) {
                     ViewState.CREATE -> {
                         addElementButton.text = "Добавить записи"
@@ -165,7 +167,7 @@ class EditView<T : AbstractEntity>(
 
             override fun handleLongProperty(name: String, property: KProperty1<T, ObjectProperty<Long>>) {
                 val column = tableView.getColumnBy(property) as TableColumn<T, Long>
-                val exceptionHandledUnitConverter = object: LongStringConverter() {
+                val exceptionHandledUnitConverter = object : LongStringConverter() {
                     override fun fromString(string: String?): Long {
                         val prevValue = property.get(tableView.selectedItem!!).value
                         return try {
@@ -223,7 +225,7 @@ class EditView<T : AbstractEntity>(
             controller.loadAll(
                 PageRequest.of(pageIndex, pageSize, sortBox.sort),
                 dataSourceUrlProperty.value
-            )
+            ).setProgressIndicator(root)
         }
     }
 
@@ -325,21 +327,19 @@ class EditView<T : AbstractEntity>(
     }
 
     private fun save() {
-        val saveList =
-            tableViewEditModel.items.asSequence().filter { it.value.isDirty && it.key !in toDeleteList }.map { it.key }
-                .toList()
-        controller.saveAll(toDeleteList, saveList)
+        controller.saveAll(toDeleteList, tableViewEditModel.items.filter { it.value.isDirty }.map { it.key }.toList())
+            .setProgressIndicator(root)
             .subscribe(
                 {
                     tableViewEditModel.commit()
                     toDeleteList.clear()
+                    tableViewPagination.loadPage(pagination.currentPageIndex)
+                    alert(Alert.AlertType.INFORMATION, "Изменения успешно сохранены")
                 },
                 {
-                    it.printStackTrace()
+                    alert(Alert.AlertType.ERROR, "Ошибка", it.message)
                 }
             )
-
-        tableViewPagination.loadPage(pagination.currentPageIndex)
     }
 
     private fun cancel() {

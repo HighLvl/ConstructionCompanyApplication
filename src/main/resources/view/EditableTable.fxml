@@ -12,141 +12,147 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="559.0" prefWidth="1038.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+<StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane fx:id="borderPane" prefHeight="559.0" prefWidth="1038.0">
+         <center>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Button fx:id="saveButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="150.0" text="Сохранить изменения">
-                           <HBox.margin>
-                              <Insets bottom="7.0" left="10.0" />
-                           </HBox.margin>
-                        </Button>
-                        <Button fx:id="cancelButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="150.0" text="Отменить">
-                           <HBox.margin>
-                              <Insets bottom="7.0" left="30.0" />
-                           </HBox.margin>
-                        </Button>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="saveButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="150.0" text="Сохранить изменения">
+                                 <HBox.margin>
+                                    <Insets bottom="7.0" left="10.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button fx:id="cancelButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="150.0" text="Отменить">
+                                 <HBox.margin>
+                                    <Insets bottom="7.0" left="30.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <AnchorPane>
+                                 <children>
+                                    <Button fx:id="showAllButton" mnemonicParsing="false" prefHeight="35.0" prefWidth="150.0" text="Показать все" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="7.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <AnchorPane maxHeight="1.7976931348623157E308" prefHeight="1080.0">
+                           <children>
+                              <Pagination fx:id="pagination" layoutY="463.0" prefHeight="530.0" prefWidth="703.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <AnchorPane layoutX="14.0" layoutY="485.0" minWidth="-Infinity" prefHeight="34.0" prefWidth="46.0" AnchorPane.bottomAnchor="9.399999999999977" AnchorPane.leftAnchor="13.999999999999979">
+                                 <children>
+                                    <MenuButton fx:id="pageSizeMenu" layoutX="-11.0" minHeight="-Infinity" mnemonicParsing="false" prefHeight="28.0" prefWidth="68.0" text="size" AnchorPane.bottomAnchor="6.399999999999999" AnchorPane.leftAnchor="0.0">
+                                       <items>
+                                          <MenuItem fx:id="pageSize25" mnemonicParsing="false" text="25" />
+                                          <MenuItem fx:id="pageSize50" mnemonicParsing="false" text="50" />
+                                          <MenuItem fx:id="pageSize100" mnemonicParsing="false" text="100" />
+                                       </items>
+                                    </MenuButton>
+                                 </children>
+                              </AnchorPane>
+                              <HBox layoutX="543.0" layoutY="482.0" prefHeight="24.0" prefWidth="154.0" AnchorPane.bottomAnchor="6.7999999999999545" AnchorPane.rightAnchor="-7.0">
+                                 <children>
+                                    <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="122.0">
+                                       <children>
+                                          <Label layoutX="-7.0" layoutY="6.0" prefHeight="28.0" prefWidth="114.0" text="Всего записей:" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-7.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="6.0" />
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="30.0">
+                                       <children>
+                                          <Label fx:id="totalElementsLabel" layoutX="-19.0" layoutY="4.0" prefHeight="30.0" prefWidth="65.0" text="344" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-19.0" AnchorPane.rightAnchor="-16.0" AnchorPane.topAnchor="6.0">
+                                             <font>
+                                                <Font name="System Bold Italic" size="12.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </center>
+         <right>
+            <AnchorPane minWidth="-Infinity" prefHeight="529.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+               <children>
+                  <VBox fx:id="rightVBox" alignment="TOP_CENTER" layoutX="14.0" layoutY="-2.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="529.0" prefWidth="400.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
                         <AnchorPane>
                            <children>
-                              <Button fx:id="showAllButton" mnemonicParsing="false" prefHeight="35.0" prefWidth="150.0" text="Показать все" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" />
+                              <Accordion fx:id="filterAccordion" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0">
+                                 <panes>
+                                    <TitledPane fx:id="filterPane" animated="false" text="Фильтр" />
+                                 </panes>
+                                 <padding>
+                                    <Insets bottom="7.0" top="7.0" />
+                                 </padding>
+                              </Accordion>
                            </children>
                         </AnchorPane>
-                     </children>
-                     <VBox.margin>
-                        <Insets top="7.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <AnchorPane maxHeight="1.7976931348623157E308" prefHeight="1080.0">
-                     <children>
-                        <Pagination fx:id="pagination" layoutY="463.0" prefHeight="530.0" prefWidth="703.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                        <AnchorPane layoutX="14.0" layoutY="485.0" minWidth="-Infinity" prefHeight="34.0" prefWidth="46.0" AnchorPane.bottomAnchor="9.399999999999977" AnchorPane.leftAnchor="13.999999999999979">
+                        <Label alignment="CENTER" prefHeight="26.0" prefWidth="184.0" text="Ссылаемые таблицы">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                        <AnchorPane>
                            <children>
-                              <MenuButton fx:id="pageSizeMenu" layoutX="-11.0" minHeight="-Infinity" mnemonicParsing="false" prefHeight="28.0" prefWidth="68.0" text="size" AnchorPane.bottomAnchor="6.399999999999999" AnchorPane.leftAnchor="0.0">
-                                 <items>
-                                    <MenuItem fx:id="pageSize25" mnemonicParsing="false" text="25" />
-                                    <MenuItem fx:id="pageSize50" mnemonicParsing="false" text="50" />
-                                    <MenuItem fx:id="pageSize100" mnemonicParsing="false" text="100" />
-                                 </items>
-                              </MenuButton>
+                              <ListView fx:id="referrerListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
-                        <HBox layoutX="543.0" layoutY="482.0" prefHeight="24.0" prefWidth="154.0" AnchorPane.bottomAnchor="6.7999999999999545" AnchorPane.rightAnchor="-7.0">
+                        <Label alignment="CENTER" prefHeight="26.0" prefWidth="211.0" text="Ссылающиеся таблицы">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                        <AnchorPane>
                            <children>
-                              <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="122.0">
-                                 <children>
-                                    <Label layoutX="-7.0" layoutY="6.0" prefHeight="28.0" prefWidth="114.0" text="Всего записей:" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-7.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="6.0" />
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="30.0">
-                                 <children>
-                                    <Label fx:id="totalElementsLabel" layoutX="-19.0" layoutY="4.0" prefHeight="30.0" prefWidth="65.0" text="344" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-19.0" AnchorPane.rightAnchor="-16.0" AnchorPane.topAnchor="6.0">
-                                       <font>
-                                          <Font name="System Bold Italic" size="12.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
+                              <ListView fx:id="referencingListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
                            </children>
-                        </HBox>
+                        </AnchorPane>
+                        <Button fx:id="addElementButton" alignment="CENTER" minHeight="-Infinity" mnemonicParsing="false" prefHeight="42.0" prefWidth="286.0" text="Добавить записи">
+                           <VBox.margin>
+                              <Insets top="7.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="refreshButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="42.0" prefWidth="286.0" text="Обновить">
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="7.0" />
+                           </VBox.margin>
+                        </Button>
                      </children>
-                  </AnchorPane>
+                  </VBox>
                </children>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </VBox>
-         </children>
-      </AnchorPane>
-   </center>
-   <right>
-      <AnchorPane minWidth="-Infinity" prefHeight="529.0" prefWidth="400.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox fx:id="rightVBox" alignment="TOP_CENTER" layoutX="14.0" layoutY="-2.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="529.0" prefWidth="400.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <AnchorPane>
-                     <children>
-                        <Accordion fx:id="filterAccordion" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0">
-                          <panes>
-                            <TitledPane fx:id="filterPane" animated="false" text="Фильтр" />
-                          </panes>
-                           <padding>
-                              <Insets bottom="7.0" top="7.0" />
-                           </padding>
-                        </Accordion>
-                     </children>
-                  </AnchorPane>
-                  <Label alignment="CENTER" prefHeight="26.0" prefWidth="184.0" text="Ссылаемые таблицы">
-                     <font>
-                        <Font name="System Bold" size="16.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Label>
-                  <AnchorPane>
-                     <children>
-                        <ListView fx:id="referrerListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
-                     </children>
-                  </AnchorPane>
-                  <Label alignment="CENTER" prefHeight="26.0" prefWidth="211.0" text="Ссылающиеся таблицы">
-                     <font>
-                        <Font name="System Bold" size="16.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Label>
-                  <AnchorPane>
-                     <children>
-                        <ListView fx:id="referencingListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
-                     </children>
-                  </AnchorPane>
-                  <Button fx:id="addElementButton" alignment="CENTER" minHeight="-Infinity" mnemonicParsing="false" prefHeight="42.0" prefWidth="286.0" text="Добавить записи">
-                     <VBox.margin>
-                        <Insets top="7.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="refreshButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="42.0" prefWidth="286.0" text="Обновить">
-                     <VBox.margin>
-                        <Insets bottom="5.0" top="7.0" />
-                     </VBox.margin>
-                  </Button>
-               </children>
-            </VBox>
-         </children>
-      </AnchorPane>
-   </right>
-   <opaqueInsets>
-      <Insets />
-   </opaqueInsets>
-   <bottom>
-      <VBox fx:id="topVBox" BorderPane.alignment="CENTER" />
-   </bottom>
-</BorderPane>
+            </AnchorPane>
+         </right>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <bottom>
+            <VBox fx:id="topVBox" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
+   </children>
+</StackPane>

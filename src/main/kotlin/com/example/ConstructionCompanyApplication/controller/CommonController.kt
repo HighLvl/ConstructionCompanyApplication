@@ -35,6 +35,15 @@ class CommonController<T : AbstractEntity>(entityClass: KClass<T>) {
             }
     }
 
+    fun saveAll(toDelete: Collection<T>, toSave: Collection<T>): Single<Unit> = Single.fromCallable {
+        if (toDelete.isNotEmpty())
+            service.deleteAll(toDelete)
+        if (toSave.isNotEmpty())
+            service.saveAll(toSave.filter { it !in toDelete }.toList())
+    }
+        .subscribeOn(RxSchedulers.io)
+        .observeOn(RxSchedulers.main)
+
     @Suppress("UNCHECKED_CAST")
     private fun updateDataWith(result: PagedModel<EntityModel<T>>?): PageInfo {
         fun toLinkInfoList(links: Links) = links.toList().mapNotNull { toLinkInfo(it) }.asObservable()
@@ -49,13 +58,6 @@ class CommonController<T : AbstractEntity>(entityClass: KClass<T>) {
         tableRelatedLinksList.setAll(toLinkInfoList(result.links))
         return PageInfo(result.metadata!!.totalElements, result.metadata!!.totalPages)
     }
-
-    fun saveAll(toDelete: Collection<T>, collection: Collection<T>): Completable = Completable.fromRunnable {
-        if (toDelete.isEmpty() && collection.isEmpty()) return@fromRunnable
-        service.saveAll(collection)
-    }
-        .subscribeOn(RxSchedulers.io)
-        .observeOn(RxSchedulers.main)
 
     private fun toLinkInfo(link: Link): LinkInfo? {
         val propertyName: String

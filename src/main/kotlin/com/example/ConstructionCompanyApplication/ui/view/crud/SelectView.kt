@@ -1,15 +1,18 @@
 package com.example.ConstructionCompanyApplication.ui.view.crud
 
-import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
-import com.example.ConstructionCompanyApplication.dto.AbstractEntity
 import com.example.ConstructionCompanyApplication.controller.CommonController
+import com.example.ConstructionCompanyApplication.dto.AbstractEntity
+import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
 import com.example.ConstructionCompanyApplication.ui.view.EntityTableView
 import com.example.ConstructionCompanyApplication.ui.view.EntityTableViewPagination
 import com.example.ConstructionCompanyApplication.ui.view.SortBox
+import com.example.ConstructionCompanyApplication.ui.view.setProgressIndicator
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.Scene
 import javafx.scene.control.*
-import javafx.scene.layout.*
+import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.StackPane
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.springframework.data.domain.PageRequest
@@ -19,7 +22,7 @@ import kotlin.reflect.KClass
 @Suppress("UNCHECKED_CAST")
 class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {
-    override val root: BorderPane by fxml("/view/SelectTable.fxml")
+    override val root: StackPane by fxml("/view/SelectTable.fxml")
     private val selectButton: Button by fxid()
     private val pagination: Pagination by fxid()
     private val pageSizeMenu: MenuButton by fxid()
@@ -105,9 +108,9 @@ class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     }
 
     private fun initPagination() {
-        tableViewPagination.loadPage = {
-            pageIndex, pageSize ->
+        tableViewPagination.loadPage = { pageIndex, pageSize ->
             controller.loadAll(PageRequest.of(pageIndex, pageSize, sortBox.sort))
+                .setProgressIndicator(root)
         }
     }
 
@@ -115,7 +118,6 @@ class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
         selectButton.disableWhen(itemViewModel.empty)
         selectButton.action {
             selectedEntityProperty.set(itemViewModel.item)
-            println("select ${itemViewModel.item}")
             stage.close()
         }
     }

@@ -6,14 +6,12 @@ import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigu
 import com.example.ConstructionCompanyApplication.ui.view.*
 import javafx.beans.property.ObjectProperty
 import javafx.collections.ListChangeListener
-import javafx.scene.Scene
+import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
-import javafx.scene.layout.BorderPane
+import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
-import javafx.stage.Modality
-import javafx.stage.Stage
 import tornadofx.*
 import tornadofx.converter.UnitConverter
 import java.time.LocalDate
@@ -24,7 +22,7 @@ import kotlin.reflect.full.createInstance
 @Suppress("UNCHECKED_CAST")
 class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {
-    override val root: BorderPane by fxml("/view/CreateTable.fxml")
+    override val root: StackPane by fxml("/view/CreateTable.fxml")
     private val saveButton: Button by fxid()
     private val totalElementsLabel: Label by fxid()
     private val fieldSetVBox: VBox by fxid()
@@ -38,9 +36,6 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
 
     private val controller = CommonController(entityClass)
 
-
-    private val stage = Stage()
-
     init {
         itemViewModel.itemProperty.addListener { _, _, newValue ->
             tableView.validator.item = newValue
@@ -51,22 +46,12 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
         initTableView()
         initEditFieldSet()
         initSaveButton()
-        initStage()
 
         itemViewModel.propertyMap.keys.forEach {
             it.addListener { _, _, _ ->
                 itemViewModel.commit(it)
             }
         }
-    }
-
-    fun show() = stage.showAndWait()
-
-
-    private fun initStage() {
-        stage.initModality(Modality.APPLICATION_MODAL)
-        stage.scene = Scene(root)
-        stage.title = title
     }
 
     private fun initDeleteColumn() {
@@ -175,10 +160,17 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     private fun initSaveButton() {
         saveButton.enableWhen(itemList.sizeProperty.greaterThan(0))
         saveButton.action {
-            controller.saveAll(emptyList(), itemList).subscribe {
-                reset()
-                stage.close()
-            }
+            controller.saveAll(emptyList(), itemList)
+                .setProgressIndicator(root)
+                .subscribe(
+                {
+                    reset()
+                    alert(Alert.AlertType.INFORMATION, "Записи успешно добавлены")
+                },
+                {
+                    alert(Alert.AlertType.ERROR, "Ошибка", it.message)
+                }
+            )
 
         }
     }

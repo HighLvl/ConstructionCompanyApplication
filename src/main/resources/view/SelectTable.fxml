@@ -11,81 +11,86 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="559.0" prefWidth="1038.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane prefHeight="559.0" prefWidth="1038.0">
+         <center>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Button fx:id="selectButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="150.0" text="Выбрать">
-                           <HBox.margin>
-                              <Insets bottom="7.0" left="10.0" />
-                           </HBox.margin>
-                        </Button>
-                     </children>
-                  </HBox>
-                  <AnchorPane maxHeight="1.7976931348623157E308" prefHeight="1080.0">
-                     <children>
-                        <Pagination fx:id="pagination" layoutY="463.0" prefHeight="530.0" prefWidth="703.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                        <AnchorPane layoutX="14.0" layoutY="485.0" minWidth="-Infinity" prefHeight="34.0" prefWidth="46.0" AnchorPane.bottomAnchor="9.399999999999977" AnchorPane.leftAnchor="13.999999999999979">
+                        <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <MenuButton fx:id="pageSizeMenu" layoutX="-11.0" minHeight="-Infinity" mnemonicParsing="false" prefHeight="28.0" prefWidth="68.0" text="size" AnchorPane.bottomAnchor="6.399999999999999" AnchorPane.leftAnchor="0.0">
-                                 <items>
-                                    <MenuItem fx:id="pageSize25" mnemonicParsing="false" text="25" />
-                                    <MenuItem fx:id="pageSize50" mnemonicParsing="false" text="50" />
-                                    <MenuItem fx:id="pageSize100" mnemonicParsing="false" text="100" />
-                                 </items>
-                              </MenuButton>
-                           </children>
-                        </AnchorPane>
-                        <HBox layoutX="543.0" layoutY="482.0" prefHeight="24.0" prefWidth="154.0" AnchorPane.bottomAnchor="6.7999999999999545" AnchorPane.rightAnchor="-7.0">
-                           <children>
-                              <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="122.0">
-                                 <children>
-                                    <Label layoutX="-7.0" layoutY="6.0" prefHeight="28.0" prefWidth="114.0" text="Всего записей:" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-7.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="6.0" />
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="30.0">
-                                 <children>
-                                    <Label fx:id="totalElementsLabel" layoutX="-19.0" layoutY="4.0" prefHeight="30.0" prefWidth="65.0" text="344" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-19.0" AnchorPane.rightAnchor="-16.0" AnchorPane.topAnchor="6.0">
-                                       <font>
-                                          <Font name="System Bold Italic" size="12.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
+                              <Button fx:id="selectButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="150.0" text="Выбрать">
+                                 <HBox.margin>
+                                    <Insets bottom="7.0" left="10.0" />
+                                 </HBox.margin>
+                              </Button>
                            </children>
                         </HBox>
+                        <AnchorPane maxHeight="1.7976931348623157E308" prefHeight="1080.0">
+                           <children>
+                              <Pagination fx:id="pagination" layoutY="463.0" prefHeight="530.0" prefWidth="703.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <AnchorPane layoutX="14.0" layoutY="485.0" minWidth="-Infinity" prefHeight="34.0" prefWidth="46.0" AnchorPane.bottomAnchor="9.399999999999977" AnchorPane.leftAnchor="13.999999999999979">
+                                 <children>
+                                    <MenuButton fx:id="pageSizeMenu" layoutX="-11.0" minHeight="-Infinity" mnemonicParsing="false" prefHeight="28.0" prefWidth="68.0" text="size" AnchorPane.bottomAnchor="6.399999999999999" AnchorPane.leftAnchor="0.0">
+                                       <items>
+                                          <MenuItem fx:id="pageSize25" mnemonicParsing="false" text="25" />
+                                          <MenuItem fx:id="pageSize50" mnemonicParsing="false" text="50" />
+                                          <MenuItem fx:id="pageSize100" mnemonicParsing="false" text="100" />
+                                       </items>
+                                    </MenuButton>
+                                 </children>
+                              </AnchorPane>
+                              <HBox layoutX="543.0" layoutY="482.0" prefHeight="24.0" prefWidth="154.0" AnchorPane.bottomAnchor="6.7999999999999545" AnchorPane.rightAnchor="-7.0">
+                                 <children>
+                                    <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="122.0">
+                                       <children>
+                                          <Label layoutX="-7.0" layoutY="6.0" prefHeight="28.0" prefWidth="114.0" text="Всего записей:" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-7.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="6.0" />
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="30.0">
+                                       <children>
+                                          <Label fx:id="totalElementsLabel" layoutX="-19.0" layoutY="4.0" prefHeight="30.0" prefWidth="65.0" text="344" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="-19.0" AnchorPane.rightAnchor="-16.0" AnchorPane.topAnchor="6.0">
+                                             <font>
+                                                <Font name="System Bold Italic" size="12.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
                      </children>
-                  </AnchorPane>
+                  </VBox>
                </children>
-            </VBox>
-         </children>
-         <BorderPane.margin>
-            <Insets top="7.0" />
-         </BorderPane.margin>
-      </AnchorPane>
-   </center>
-   <opaqueInsets>
-      <Insets />
-   </opaqueInsets>
-   <bottom>
-      <HBox fx:id="sortHBox" BorderPane.alignment="CENTER" />
-   </bottom>
-   <top>
-      <Accordion BorderPane.alignment="TOP_LEFT">
-        <panes>
-          <TitledPane animated="false" text="Фильтр">
-               <content>
-                  <AnchorPane fx:id="filterPane" />
-               </content>
-            </TitledPane>
-        </panes>
-      </Accordion>
-   </top>
-</BorderPane>
+               <BorderPane.margin>
+                  <Insets top="7.0" />
+               </BorderPane.margin>
+            </AnchorPane>
+         </center>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <bottom>
+            <HBox fx:id="sortHBox" BorderPane.alignment="CENTER" />
+         </bottom>
+         <top>
+            <Accordion BorderPane.alignment="TOP_LEFT">
+               <panes>
+                  <TitledPane animated="false" text="Фильтр">
+                     <content>
+                        <AnchorPane fx:id="filterPane" />
+                     </content>
+                  </TitledPane>
+               </panes>
+            </Accordion>
+         </top>
+      </BorderPane>
+   </children>
+</StackPane>

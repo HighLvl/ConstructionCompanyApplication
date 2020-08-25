@@ -2,10 +2,7 @@ package com.example.ConstructionCompanyApplication.ui.view
 
 import com.example.ConstructionCompanyApplication.controller.CommonController
 import io.reactivex.Single
-import javafx.scene.control.Label
-import javafx.scene.control.MenuButton
-import javafx.scene.control.MenuItem
-import javafx.scene.control.Pagination
+import javafx.scene.control.*
 import tornadofx.*
 
 class EntityTableViewPagination(
@@ -16,7 +13,6 @@ class EntityTableViewPagination(
     pageSize50: MenuItem,
     pageSize100: MenuItem,
     private val totalElementsLabel: Label
-
 ) {
     private var pageSize = 25
     lateinit var loadPage: (pageIndex: Int, pageSize: Int) -> Single<CommonController.PageInfo>
@@ -48,7 +44,7 @@ class EntityTableViewPagination(
                     totalElementsLabel.text = pageInfo.totalElements.toString()
                 },
                 {
-
+                    alert(Alert.AlertType.ERROR, "Ошибка", it.message)
                 }
             )
     }

@@ -8,7 +8,6 @@ import com.example.ConstructionCompanyApplication.ui.view.*
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Node
-import javafx.scene.Parent
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.BorderPane
@@ -27,7 +26,7 @@ import kotlin.reflect.KProperty1
 class EditView<T : AbstractEntity>(
     private val entityClass: KClass<T>
 ) : View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {
-    override val root: StackPane by fxml("/view/EditableTable.fxml")
+    override val root: StackPane by fxml("/view/EditView.fxml")
     private val borderPane: BorderPane by fxid()
     private val pageSizeMenu: MenuButton by fxid()
     private val pageSize25: MenuItem by fxid()

@@ -22,7 +22,7 @@ import kotlin.reflect.KClass
 @Suppress("UNCHECKED_CAST")
 class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {
-    override val root: StackPane by fxml("/view/SelectTable.fxml")
+    override val root: StackPane by fxml("/view/SelectView.fxml")
     private val selectButton: Button by fxid()
     private val pagination: Pagination by fxid()
     private val pageSizeMenu: MenuButton by fxid()

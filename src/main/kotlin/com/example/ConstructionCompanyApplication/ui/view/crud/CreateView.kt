@@ -22,7 +22,7 @@ import kotlin.reflect.full.createInstance
 @Suppress("UNCHECKED_CAST")
 class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {
-    override val root: StackPane by fxml("/view/CreateTable.fxml")
+    override val root: StackPane by fxml("/view/CreateView.fxml")
     private val saveButton: Button by fxid()
     private val totalElementsLabel: Label by fxid()
     private val fieldSetVBox: VBox by fxid()

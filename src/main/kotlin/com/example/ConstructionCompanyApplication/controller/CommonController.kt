@@ -2,6 +2,8 @@ package com.example.ConstructionCompanyApplication.controller
 
 import com.example.ConstructionCompanyApplication.dto.AbstractEntity
 import com.example.ConstructionCompanyApplication.service.CommonService
+import io.reactivex.Completable
+import io.reactivex.Single
 import javafx.collections.ObservableList
 import org.springframework.data.domain.Pageable
 import org.springframework.hateoas.EntityModel
@@ -11,7 +13,7 @@ import org.springframework.hateoas.PagedModel
 import tornadofx.*
 import kotlin.reflect.KClass
 
-class CommonController<T : AbstractEntity>(entityClass: KClass<T>) : Controller() {
+class CommonController<T : AbstractEntity>(entityClass: KClass<T>) {
     val dataList = observableListOf<T>()
     val itemRelatedLinksMap = observableMapOf<T, ObservableList<LinkInfo>>()
     val tableRelatedLinksList = observableListOf<LinkInfo>()
@@ -19,13 +21,18 @@ class CommonController<T : AbstractEntity>(entityClass: KClass<T>) : Controller(
 
     private val service = CommonService(entityClass)
 
-    fun loadAll(pageable: Pageable, url: String = ""): PageInfo {
-        val result = if (filter.isEmpty())
-            if (url.isEmpty()) service.getAll(pageable) else service.get(url, pageable)
-        else
-            service.findByRsql(pageable, filter)
-
-        return updateDataWith(result)
+    fun loadAll(pageable: Pageable, url: String = ""): Single<PageInfo> {
+        return Single.fromCallable {
+            if (filter.isEmpty())
+                if (url.isEmpty()) service.getAll(pageable) else service.get(url, pageable)
+            else
+                service.findByRsql(pageable, filter)
+        }
+            .subscribeOn(RxSchedulers.io)
+            .observeOn(RxSchedulers.main)
+            .map { result ->
+                updateDataWith(result)
+            }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -43,15 +50,12 @@ class CommonController<T : AbstractEntity>(entityClass: KClass<T>) : Controller(
         return PageInfo(result.metadata!!.totalElements, result.metadata!!.totalPages)
     }
 
-    fun deleteAll(collection: Collection<T>) {
-        if (collection.isEmpty()) return
-        service.deleteAll(collection)
-    }
-
-    fun saveAll(collection: Collection<T>) {
-        if (collection.isEmpty()) return
+    fun saveAll(toDelete: Collection<T>, collection: Collection<T>): Completable = Completable.fromRunnable {
+        if (toDelete.isEmpty() && collection.isEmpty()) return@fromRunnable
         service.saveAll(collection)
     }
+        .subscribeOn(RxSchedulers.io)
+        .observeOn(RxSchedulers.main)
 
     private fun toLinkInfo(link: Link): LinkInfo? {
         val propertyName: String

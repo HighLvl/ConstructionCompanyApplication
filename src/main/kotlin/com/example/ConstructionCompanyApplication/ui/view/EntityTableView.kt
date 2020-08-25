@@ -6,32 +6,52 @@ import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Pos
+import javafx.scene.control.Alert
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.util.Callback
 import tornadofx.*
-import tornadofx.control.DatePickerTableCell
 import java.time.LocalDate
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
-import kotlin.reflect.full.createInstance
 
 
 @Suppress("UNCHECKED_CAST")
-class EntityTableView<T> : TableView<T>() {
+class EntityTableView<T: AbstractEntity> : TableView<T>() {
+    val validator = EntityValidator<T>()
+
     private val editablePropertyHandlerList =
         mutableListOf<Triple<KFunction<Unit>, String, KProperty1<T, ObjectProperty<*>>>>()
     private val propertyColumnMap = mutableMapOf<KProperty1<T, ObjectProperty<*>>, TableColumn<T, *>>()
-
 
     val propertyColumns: Collection<TableColumn<T, *>>
         get() = propertyColumnMap.values
 
     init {
         addNumerationColumn()
+        addValidation()
+    }
+
+    private fun addValidation() {
+        var prevValue: Any? = null
+        this.onEditStart {
+            prevValue = this.oldValue
+        }
+        this.onEditCommit {
+            validator.item = rowValue
+            val property = getPropertyBy(tableColumn)
+            if(!validator.isValid(property, newValue)) {
+                getPropertyBy(tableColumn).get(rowValue).value = prevValue
+                val dirtyValue = editModel.items[rowValue]?.dirtyColumns?.get(tableColumn as TableColumn<T, Any?>)
+                if (prevValue == dirtyValue) {
+                    editModel.items[rowValue]?.dirtyColumns?.remove(tableColumn as TableColumn<T, Any?>)
+                }
+                alert(Alert.AlertType.ERROR, "Введено некорректное значение", validator.getErrorMessage(property))
+            }
+        }
     }
 
     private fun addNumerationColumn() {
@@ -88,29 +108,27 @@ class EntityTableView<T> : TableView<T>() {
     }
 
     private fun addIntegerColumn(name: String, property: KProperty1<T, ObjectProperty<Int>>) {
-        editablePropertyHandlerList.add(Triple(EditablePropertyHandler<T>::handleIntegerProperty, name, property))
+        editablePropertyHandlerList.add(Triple(PropertyHandler<T>::handleIntegerProperty, name, property))
         propertyColumnMap[property] = column(name, property)
     }
 
     private fun addLongColumn(name: String, property: KProperty1<T, ObjectProperty<Long>>) {
-        editablePropertyHandlerList.add(Triple(EditablePropertyHandler<T>::handleLongProperty, name, property))
+        editablePropertyHandlerList.add(Triple(PropertyHandler<T>::handleLongProperty, name, property))
         propertyColumnMap[property] = column(name, property)
     }
 
     private fun addStringColumn(name: String, property: KProperty1<T, ObjectProperty<String>>) {
-        editablePropertyHandlerList.add(Triple(EditablePropertyHandler<T>::handleStringProperty, name, property))
+        editablePropertyHandlerList.add(Triple(PropertyHandler<T>::handleStringProperty, name, property))
         propertyColumnMap[property] = column(name, property)
     }
 
     private fun addDateColumn(name: String, property: KProperty1<T, ObjectProperty<LocalDate>>) {
-        editablePropertyHandlerList.add(Triple(EditablePropertyHandler<T>::handleLocalDateProperty, name, property))
-        propertyColumnMap[property] = column(name, property) {
-            cellFactory = DatePickerTableCell.forTableColumn()
-        }
+        editablePropertyHandlerList.add(Triple(PropertyHandler<T>::handleLocalDateProperty, name, property))
+        propertyColumnMap[property] = column(name, property)
     }
 
     private fun addBooleanColumn(name: String, property: KProperty1<T, ObjectProperty<Boolean>>) {
-        editablePropertyHandlerList.add(Triple(EditablePropertyHandler<T>::handleBooleanProperty, name, property))
+        editablePropertyHandlerList.add(Triple(PropertyHandler<T>::handleBooleanProperty, name, property))
         propertyColumnMap[property] = column(name, property)
     }
 
@@ -118,7 +136,7 @@ class EntityTableView<T> : TableView<T>() {
         name: String,
         property: KProperty1<T, SimpleObjectProperty<AbstractEntity>>
     ) {
-        editablePropertyHandlerList.add(Triple(EditablePropertyHandler<T>::handleEntityProperty, name, property))
+        editablePropertyHandlerList.add(Triple(PropertyHandler<T>::handleEntityProperty, name, property))
         propertyColumnMap[property] = column(name, property)
     }
 
@@ -146,13 +164,15 @@ class EntityTableView<T> : TableView<T>() {
     fun getPropertyBy(column: TableColumn<*, *>) =
         propertyColumnMap.entries.first { it.value == column }.key
 
-    fun handleProperties(handler: EditablePropertyHandler<T>) {
+    fun handleProperties(handler: PropertyHandler<T>) {
         for ((function, name, property) in editablePropertyHandlerList) {
             function.call(handler, name, property)
         }
     }
 
-    interface EditablePropertyHandler<T> {
+
+
+    interface PropertyHandler<T> {
         fun handleIntegerProperty(
             name: String, property: KProperty1<T, ObjectProperty<Int>>
         ) {
@@ -232,6 +252,33 @@ class BuildObjectTableViewFactory : TableViewFactory {
             "Участок" to BuildObject::plot,
             "Заказчик" to BuildObject::customer
         )
+        validator.setValidator<LocalDate>(BuildObject::startDate, "Дата окончания строительства >= дата начала строительства") { newValue, rowItem ->
+            newValue ?: return@setValidator false
+            rowItem.finishDate.value ?: return@setValidator true
+            newValue <= rowItem.finishDate.value
+        }
+        validator.setValidator<LocalDate>(BuildObject::finishDate, "Дата окончания строительства >= дата начала строительства") {newValue, rowItem ->
+            newValue ?: return@setValidator true
+            rowItem.startDate.value ?: return@setValidator false
+            newValue >= rowItem.startDate.value
+        }
+        validator.setValidator<Long>(BuildObject::id, "Значение должно быть >= 0") {newValue, _ ->
+            newValue ?: return@setValidator true
+            newValue >= 0
+        }
+        validator.setValidator<Prototype>(BuildObject::prototype, "Значение не может быть пусто") { newValue, _ ->
+            newValue ?: return@setValidator false
+            true
+        }
+        validator.setValidator<Plot>(BuildObject::plot, "Значение не может быть пусто") { newValue, _ ->
+            newValue ?: return@setValidator false
+            true
+        }
+        validator.setValidator<Customer>(BuildObject::customer, "Значение не может быть пусто") { newValue, _ ->
+            newValue ?: return@setValidator false
+            true
+        }
+
         this
     }
 }

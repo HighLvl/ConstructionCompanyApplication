@@ -6,7 +6,6 @@ import com.example.ConstructionCompanyApplication.controller.CommonController
 import com.example.ConstructionCompanyApplication.ui.view.EntityTableView
 import com.example.ConstructionCompanyApplication.ui.view.EntityTableViewPagination
 import com.example.ConstructionCompanyApplication.ui.view.SortBox
-import com.example.ConstructionCompanyApplication.ui.view.filter.FilterView
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.Scene
 import javafx.scene.control.*
@@ -49,7 +48,7 @@ class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
             totalElementsLabel
         )
 
-    val selectedEntity = SimpleObjectProperty<T>()
+    private val selectedEntityProperty = SimpleObjectProperty<T>()
 
     init {
         initTableView()
@@ -74,7 +73,9 @@ class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     fun select(): AbstractEntity? {
         tableViewPagination.loadPage(0)
         stage.showAndWait()
-        return selectedEntity.value
+        val selectedEntity = selectedEntityProperty.value
+        selectedEntityProperty.value = null
+        return selectedEntity
     }
 
     private fun initSortHBox() {
@@ -104,7 +105,7 @@ class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     }
 
     private fun initPagination() {
-        tableViewPagination.pageLoader = {
+        tableViewPagination.loadPage = {
             pageIndex, pageSize ->
             controller.loadAll(PageRequest.of(pageIndex, pageSize, sortBox.sort))
         }
@@ -113,7 +114,7 @@ class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     private fun initSelectButton() {
         selectButton.disableWhen(itemViewModel.empty)
         selectButton.action {
-            selectedEntity.set(itemViewModel.item)
+            selectedEntityProperty.set(itemViewModel.item)
             println("select ${itemViewModel.item}")
             stage.close()
         }

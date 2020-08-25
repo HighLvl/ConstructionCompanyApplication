@@ -1,10 +1,9 @@
 package com.example.ConstructionCompanyApplication.ui.view.crud
 
-import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
-import com.example.ConstructionCompanyApplication.dto.AbstractEntity
 import com.example.ConstructionCompanyApplication.controller.CommonController
-import com.example.ConstructionCompanyApplication.ui.view.DeleteTableColumn
-import com.example.ConstructionCompanyApplication.ui.view.EntityTableView
+import com.example.ConstructionCompanyApplication.dto.AbstractEntity
+import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
+import com.example.ConstructionCompanyApplication.ui.view.*
 import javafx.beans.property.ObjectProperty
 import javafx.collections.ListChangeListener
 import javafx.scene.Scene
@@ -12,7 +11,6 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
@@ -40,15 +38,26 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
 
     private val controller = CommonController(entityClass)
 
+
     private val stage = Stage()
 
     init {
+        itemViewModel.itemProperty.addListener { _, _, newValue ->
+            tableView.validator.item = newValue
+        }
+
+        initAddElementButton()
         initDeleteColumn()
         initTableView()
         initEditFieldSet()
-        initAddElementButton()
         initSaveButton()
         initStage()
+
+        itemViewModel.propertyMap.keys.forEach {
+            it.addListener { _, _, _ ->
+                itemViewModel.commit(it)
+            }
+        }
     }
 
     fun show() = stage.showAndWait()
@@ -92,12 +101,12 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
 
     private fun initAddElementButton() {
         itemViewModel.item = entityClass.createInstance()
-
         addElementButton.action {
             itemViewModel.commit()
             itemList.add(itemViewModel.item)
             itemViewModel.item = entityClass.createInstance()
         }
+        addElementButton.enableWhen(itemViewModel.valid)
     }
 
     private fun initEditFieldSet() {
@@ -105,27 +114,41 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
         fieldSetVBox.add(form { add(fieldset) })
 
         tableView.handleProperties(object :
-            EntityTableView.EditablePropertyHandler<T> {
+            EntityTableView.PropertyHandler<T> {
             override fun handleStringProperty(name: String, property: KProperty1<T, ObjectProperty<String>>) {
                 fieldset.add(field(name))
-                fieldset.add(textfield(itemViewModel.bind(property)))
+                fieldset.add(textfield(itemViewModel.bind(property)) {
+                    filterInput {
+                        tableView.validator.isValid(
+                            property,
+                            it.controlNewText
+                        )
+                    }
+                })
             }
 
             override fun handleIntegerProperty(name: String, property: KProperty1<T, ObjectProperty<Int>>) {
                 fieldset.add(field(name))
-                fieldset.add(textfield(itemViewModel.bind(property)))
+                fieldset.add(textfield(itemViewModel.bind(property)) {
+                    filterNumberInput(tableView.validator, property)
+                })
             }
 
             override fun handleLongProperty(name: String, property: KProperty1<T, ObjectProperty<Long>>) {
                 fieldset.add(field(name))
-                val textField = textfield()
+                val textField = textfield { filterNumberInput(tableView.validator, property) }
                 textField.textProperty().bindBidirectional(itemViewModel.bind(property), UnitConverter())
                 fieldset.add(textField)
             }
 
             override fun handleEntityProperty(name: String, property: KProperty1<T, ObjectProperty<AbstractEntity>>) {
+                val entitySelector = EntitySelector(property, itemViewModel)
+                entitySelector.onSelectEntityListener = { entity ->
+                    property.get(itemViewModel.item).set(entity)
+                }
+                entitySelector.addValidator(tableView.validator, property)
                 fieldset.add(field(name))
-                fieldset.add(buildEntitySelector(property))
+                fieldset.add(entitySelector)
             }
 
             override fun handleBooleanProperty(name: String, property: KProperty1<T, ObjectProperty<Boolean>>) {
@@ -137,28 +160,13 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
 
             override fun handleLocalDateProperty(name: String, property: KProperty1<T, ObjectProperty<LocalDate>>) {
                 fieldset.add(field(name))
-                fieldset.add(datepicker(itemViewModel.bind(property)))
+                val datePicker = datepicker(itemViewModel.bind(property))
+                datePicker.addValidator(tableView.validator, property)
+                fieldset.add(datePicker)
             }
         })
     }
 
-    private fun buildEntitySelector(property: KProperty1<T, ObjectProperty<AbstractEntity>>) = hbox {
-        val textField = textfield {
-            isEditable = false
-            hgrow = Priority.ALWAYS
-        }
-        itemViewModel.itemProperty.addListener { _, _, _ -> textField.text = "" }
-
-        val entityClass = property.returnType.arguments[0].type!!.classifier as KClass<T>
-        val selectView =
-            SelectView(entityClass)
-
-        button { text = "..." }.action {
-            val entity = selectView.select()
-            property.get(itemViewModel.item).set(entity)
-            textField.text = entity.toString()
-        }
-    }
 
     private fun reset() {
         itemList.clear()
@@ -167,9 +175,12 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     private fun initSaveButton() {
         saveButton.enableWhen(itemList.sizeProperty.greaterThan(0))
         saveButton.action {
-            controller.saveAll(itemList)
-            reset()
-            stage.close()
+            controller.saveAll(emptyList(), itemList).subscribe {
+                reset()
+                stage.close()
+            }
+
         }
     }
 }
+

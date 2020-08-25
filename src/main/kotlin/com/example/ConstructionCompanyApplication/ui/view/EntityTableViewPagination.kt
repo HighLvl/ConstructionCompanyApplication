@@ -1,7 +1,11 @@
 package com.example.ConstructionCompanyApplication.ui.view
 
 import com.example.ConstructionCompanyApplication.controller.CommonController
-import javafx.scene.control.*
+import io.reactivex.Single
+import javafx.scene.control.Label
+import javafx.scene.control.MenuButton
+import javafx.scene.control.MenuItem
+import javafx.scene.control.Pagination
 import tornadofx.*
 
 class EntityTableViewPagination(
@@ -13,9 +17,9 @@ class EntityTableViewPagination(
     pageSize100: MenuItem,
     private val totalElementsLabel: Label
 
-    ) {
+) {
     private var pageSize = 25
-    lateinit var pageLoader: (pageIndex: Int, pageSize: Int) -> CommonController.PageInfo
+    lateinit var loadPage: (pageIndex: Int, pageSize: Int) -> Single<CommonController.PageInfo>
 
     init {
         pagination.setPageFactory { pageIndex ->
@@ -36,9 +40,16 @@ class EntityTableViewPagination(
     }
 
     fun loadPage(pageIndex: Int) {
-        val pageInfo = pageLoader.invoke(pageIndex, pageSize)
-        val totalPages = pageInfo.totalPages.toInt()
-        pagination.pageCount = if (totalPages == 0) 1 else totalPages
-        totalElementsLabel.text = pageInfo.totalElements.toString()
+        loadPage.invoke(pageIndex, pageSize)
+            .subscribe(
+                { pageInfo ->
+                    val totalPages = pageInfo.totalPages.toInt()
+                    pagination.pageCount = if (totalPages == 0) 1 else totalPages
+                    totalElementsLabel.text = pageInfo.totalElements.toString()
+                },
+                {
+
+                }
+            )
     }
 }

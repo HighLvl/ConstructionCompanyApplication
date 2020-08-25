@@ -1,20 +1,22 @@
 package com.example.ConstructionCompanyApplication.ui.view.crud
 
+import com.example.ConstructionCompanyApplication.controller.CommonController
 import com.example.ConstructionCompanyApplication.dto.AbstractEntity
 import com.example.ConstructionCompanyApplication.service.EntityEndpointMapper
 import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
-import com.example.ConstructionCompanyApplication.controller.CommonController
 import com.example.ConstructionCompanyApplication.ui.view.*
-import com.example.ConstructionCompanyApplication.ui.view.filter.FilterView
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
+import javafx.util.converter.LongStringConverter
 import org.springframework.data.domain.PageRequest
 import tornadofx.*
 import tornadofx.control.DatePickerTableCell
+import java.lang.NumberFormatException
 import java.time.LocalDate
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -131,6 +133,7 @@ class EditView<T : AbstractEntity>(
                         refreshButton.isVisible = false
                         sortBox.isVisible = false
                         filterPane.isVisible = false
+                        filterPane.isExpanded = false
                         add(createView)
                         ViewState.CREATE
                     }
@@ -154,7 +157,7 @@ class EditView<T : AbstractEntity>(
         tableViewEditModel = tableView.editModel
 
         tableView.handleProperties(object :
-            EntityTableView.EditablePropertyHandler<T> {
+            EntityTableView.PropertyHandler<T> {
             override fun handleIntegerProperty(name: String, property: KProperty1<T, ObjectProperty<Int>>) {
                 val column = tableView.getColumnBy(property) as TableColumn<T, Int>
                 column.makeEditable()
@@ -162,7 +165,17 @@ class EditView<T : AbstractEntity>(
 
             override fun handleLongProperty(name: String, property: KProperty1<T, ObjectProperty<Long>>) {
                 val column = tableView.getColumnBy(property) as TableColumn<T, Long>
-                column.makeEditable()
+                val exceptionHandledUnitConverter = object: LongStringConverter() {
+                    override fun fromString(string: String?): Long {
+                        val prevValue = property.get(tableView.selectedItem!!).value
+                        return try {
+                            super.fromString(string)
+                        } catch (e: NumberFormatException) {
+                            prevValue
+                        }
+                    }
+                }
+                column.cellFactory = TextFieldTableCell.forTableColumn(exceptionHandledUnitConverter)
             }
 
             override fun handleBooleanProperty(name: String, property: KProperty1<T, ObjectProperty<Boolean>>) {
@@ -182,12 +195,10 @@ class EditView<T : AbstractEntity>(
 
             override fun handleEntityProperty(name: String, property: KProperty1<T, ObjectProperty<AbstractEntity>>) {
                 val column = tableView.getColumnBy(property)
+                val entityClass = property.returnType.arguments[0].type!!.classifier as KClass<T>
+                val selectView = SelectView(entityClass)
+
                 column!!.setOnEditStart {
-                    val entityClass = property.returnType.arguments[0].type!!.classifier as KClass<T>
-                    val selectView =
-                        SelectView(
-                            entityClass
-                        )
                     val selectedEntity = selectView.select() ?: return@setOnEditStart
 
                     val items = tableViewEditModel.items
@@ -208,7 +219,7 @@ class EditView<T : AbstractEntity>(
     }
 
     private fun initPagination() {
-        tableViewPagination.pageLoader = { pageIndex, pageSize ->
+        tableViewPagination.loadPage = { pageIndex, pageSize ->
             controller.loadAll(
                 PageRequest.of(pageIndex, pageSize, sortBox.sort),
                 dataSourceUrlProperty.value
@@ -236,7 +247,7 @@ class EditView<T : AbstractEntity>(
                 val columnName = tableView.getColumnNameBy(it.propertyName)
                 val hyperlink = hyperlink(columnName)
                 hyperlink.action {
-                    addTab(EntityEndpointMapper.mapToEntityClass(it.endpoint), info=columnName)
+                    addTab(EntityEndpointMapper.mapToEntityClass(it.endpoint), info = columnName)
                 }
                 graphic = hyperlink
             }
@@ -311,17 +322,22 @@ class EditView<T : AbstractEntity>(
     private fun initSaveAndCancelButtons() {
         saveButton.action { save() }
         cancelButton.action { cancel() }
-
     }
 
     private fun save() {
-        controller.deleteAll(toDeleteList)
         val saveList =
             tableViewEditModel.items.asSequence().filter { it.value.isDirty && it.key !in toDeleteList }.map { it.key }
                 .toList()
-        controller.saveAll(saveList)
-        tableViewEditModel.commit()
-        toDeleteList.clear()
+        controller.saveAll(toDeleteList, saveList)
+            .subscribe(
+                {
+                    tableViewEditModel.commit()
+                    toDeleteList.clear()
+                },
+                {
+                    it.printStackTrace()
+                }
+            )
 
         tableViewPagination.loadPage(pagination.currentPageIndex)
     }

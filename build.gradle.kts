@@ -22,6 +22,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
     implementation("org.springframework.hateoas:spring-hateoas:1.1.1.RELEASE")
     implementation("org.springframework.data:spring-data-commons:2.3.2.RELEASE")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.19")
+    implementation("io.reactivex.rxjava2:rxjavafx:2.2.2")
 
 }
 tasks.withType<Test> {

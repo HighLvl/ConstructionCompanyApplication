@@ -6,7 +6,9 @@ import com.example.ConstructionCompanyApplication.service.EntityEndpointMapper
 import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
 import com.example.ConstructionCompanyApplication.ui.view.*
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.collections.MapChangeListener
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldTableCell
@@ -17,6 +19,7 @@ import javafx.util.converter.LongStringConverter
 import org.springframework.data.domain.PageRequest
 import tornadofx.*
 import tornadofx.control.DatePickerTableCell
+import java.lang.NullPointerException
 import java.time.LocalDate
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -171,7 +174,7 @@ class EditView<T : AbstractEntity>(
                         val prevValue = property.get(tableView.selectedItem!!).value
                         return try {
                             super.fromString(string)
-                        } catch (e: NumberFormatException) {
+                        } catch (e: Exception) {
                             prevValue
                         }
                     }
@@ -221,6 +224,7 @@ class EditView<T : AbstractEntity>(
 
     private fun initPagination() {
         tableViewPagination.loadPage = { pageIndex, pageSize ->
+            cancel()
             controller.loadAll(
                 PageRequest.of(pageIndex, pageSize, sortBox.sort),
                 dataSourceUrlProperty.value
@@ -321,8 +325,23 @@ class EditView<T : AbstractEntity>(
     }
 
     private fun initSaveAndCancelButtons() {
+        val isTableViewEditModelNotDirty = SimpleBooleanProperty(true)
+        tableViewEditModel.items.addListener(MapChangeListener {
+            it.valueAdded?.dirtyColumns?.addListener(MapChangeListener {
+                val isDisable = tableViewEditModel.items.values.all { dirtyState -> !dirtyState.isDirty }
+                isTableViewEditModelNotDirty.set(isDisable)
+            })
+        })
+        val isToDeleteListEmpty = toDeleteList.sizeProperty.eq(0)
+        val isButtonsDisabled = isTableViewEditModelNotDirty.and(isToDeleteListEmpty)
+
         saveButton.action { save() }
+        saveButton.isDisable = true
+        saveButton.disableWhen( isButtonsDisabled )
+
         cancelButton.action { cancel() }
+        cancelButton.isDisable = true
+        cancelButton.disableWhen( isButtonsDisabled )
     }
 
     private fun save() {

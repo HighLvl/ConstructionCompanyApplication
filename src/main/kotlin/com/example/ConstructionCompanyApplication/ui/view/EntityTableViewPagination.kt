@@ -22,6 +22,7 @@ class EntityTableViewPagination(
             loadPage(pageIndex)
             tableView
         }
+        pagination.pageCount = 1
 
         fun changePageSize(pageSize: Int) {
             this.pageSize = pageSize

@@ -2,8 +2,9 @@ package com.example.ConstructionCompanyApplication
 
 import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
 import com.example.ConstructionCompanyApplication.ui.view.MainTabPane
-import com.example.ConstructionCompanyApplication.ui.view.crud.EditView
 import javafx.scene.control.TreeItem
+import javafx.stage.Screen
+import javafx.stage.Stage
 import tornadofx.*
 
 class StartView : View("Строительная организация") {
@@ -42,7 +43,16 @@ class StartView : View("Строительная организация") {
     }
 }
 
-class MyApp : App(StartView::class)
+class MyApp : App(StartView::class) {
+    override fun start(stage: Stage) {
+        super.start(stage)
+        stage.isMaximized = true
+        stage.minWidth = 1440.0
+        stage.minHeight = 810.0
+    }
+
+
+}
 
 fun main(args: Array<String>) {
     launch<MyApp>(args)

@@ -19,7 +19,6 @@ import javafx.util.converter.LongStringConverter
 import org.springframework.data.domain.PageRequest
 import tornadofx.*
 import tornadofx.control.DatePickerTableCell
-import java.lang.NullPointerException
 import java.time.LocalDate
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -160,7 +159,15 @@ class EditView<T : AbstractEntity>(
         )
         tableViewEditModel = tableView.editModel
 
-        tableView.handleProperties(object :
+        tableView.readonlyProperties.forEach {
+            if (tableView.isReadonly(it)) {
+                tableView.getColumnBy(it)?.setOnEditStart {
+                    alert(Alert.AlertType.INFORMATION, "Только для чтения")
+                }
+            }
+        }
+
+        tableView.handleEditableProperties(object :
             EntityTableView.PropertyHandler<T> {
             override fun handleIntegerProperty(name: String, property: KProperty1<T, ObjectProperty<Int>>) {
                 val column = tableView.getColumnBy(property) as TableColumn<T, Int>
@@ -169,12 +176,7 @@ class EditView<T : AbstractEntity>(
 
             override fun handleLongProperty(name: String, property: KProperty1<T, ObjectProperty<Long>>) {
                 val column = tableView.getColumnBy(property) as TableColumn<T, Long>
-                if(property.name == AbstractEntity::id.name) {
-                    column.setOnEditStart {
-                        alert(Alert.AlertType.INFORMATION, "Только для чтения")
-                    }
-                    return
-                }
+
                 val exceptionHandledUnitConverter = object : LongStringConverter() {
                     override fun fromString(string: String?): Long {
                         val prevValue = property.get(tableView.selectedItem!!).value
@@ -343,11 +345,11 @@ class EditView<T : AbstractEntity>(
 
         saveButton.action { save() }
         saveButton.isDisable = true
-        saveButton.disableWhen( isButtonsDisabled )
+        saveButton.disableWhen(isButtonsDisabled)
 
         cancelButton.action { cancel() }
         cancelButton.isDisable = true
-        cancelButton.disableWhen( isButtonsDisabled )
+        cancelButton.disableWhen(isButtonsDisabled)
     }
 
     private fun save() {

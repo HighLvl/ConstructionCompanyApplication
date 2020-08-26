@@ -37,6 +37,7 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     private val controller = CommonController(entityClass)
 
     init {
+        tableView.readonlyProperties.forEach { tableView.getColumnBy(it)!!.isVisible = false }
         itemViewModel.itemProperty.addListener { _, _, newValue ->
             tableView.validator.item = newValue
         }
@@ -52,6 +53,7 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
                 itemViewModel.commit(it)
             }
         }
+        itemViewModel.validate()
     }
 
     private fun initDeleteColumn() {
@@ -98,7 +100,7 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
         val fieldset = fieldset()
         fieldSetVBox.add(form { add(fieldset) })
 
-        tableView.handleProperties(object :
+        tableView.handleEditableProperties(object :
             EntityTableView.PropertyHandler<T> {
             override fun handleStringProperty(name: String, property: KProperty1<T, ObjectProperty<String>>) {
                 fieldset.add(field(name))
@@ -128,8 +130,12 @@ class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
 
             override fun handleEntityProperty(name: String, property: KProperty1<T, ObjectProperty<AbstractEntity>>) {
                 val entitySelector = EntitySelector(property, itemViewModel)
-                entitySelector.onSelectEntityListener = { entity ->
+                itemViewModel.bind(property).markDirty()
+                entitySelector.selectedEntityProperty.addListener {_, _,  entity ->
                     property.get(itemViewModel.item).set(entity)
+                }
+                itemViewModel.itemProperty.addListener { _, _, _ ->
+                    entitySelector.selectedEntity = null
                 }
                 entitySelector.addValidator(tableView.validator, property)
                 fieldset.add(field(name))

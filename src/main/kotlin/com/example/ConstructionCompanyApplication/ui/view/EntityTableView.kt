@@ -20,12 +20,14 @@ import kotlin.reflect.KProperty1
 
 
 @Suppress("UNCHECKED_CAST")
-class EntityTableView<T: AbstractEntity> : TableView<T>() {
+class EntityTableView<T : AbstractEntity> : TableView<T>() {
     val validator = EntityValidator<T>()
 
     private val editablePropertyHandlerList =
         mutableListOf<Triple<KFunction<Unit>, String, KProperty1<T, ObjectProperty<*>>>>()
     private val propertyColumnMap = mutableMapOf<KProperty1<T, ObjectProperty<*>>, TableColumn<T, *>>()
+    private val _readonlyProperties = mutableSetOf<KProperty1<T, ObjectProperty<*>>>()
+    val readonlyProperties: Collection<KProperty1<T, ObjectProperty<*>>> = _readonlyProperties
 
     val propertyColumns: Collection<TableColumn<T, *>>
         get() = propertyColumnMap.values
@@ -35,6 +37,7 @@ class EntityTableView<T: AbstractEntity> : TableView<T>() {
         addValidation()
     }
 
+
     private fun addValidation() {
         var prevValue: Any? = null
         this.onEditStart {
@@ -43,7 +46,7 @@ class EntityTableView<T: AbstractEntity> : TableView<T>() {
         this.onEditCommit {
             validator.item = rowValue
             val property = getPropertyBy(tableColumn)
-            if(!validator.isValid(property, newValue)) {
+            if (!validator.isValid(property, newValue)) {
                 getPropertyBy(tableColumn).get(rowValue).value = prevValue
                 val dirtyValue = editModel.items[rowValue]?.dirtyColumns?.get(tableColumn as TableColumn<T, Any?>)
                 if (prevValue == dirtyValue) {
@@ -70,6 +73,13 @@ class EntityTableView<T: AbstractEntity> : TableView<T>() {
         numerationColumn.isSortable = false
         addColumnInternal(numerationColumn)
     }
+
+    fun setReadonly(property: KProperty1<T, ObjectProperty<*>>) {
+        _readonlyProperties.add(property)
+    }
+
+    fun isReadonly(property: KProperty1<T, ObjectProperty<*>>) = property in _readonlyProperties
+
 
     fun addColumns(vararg pairs: Pair<String, KProperty1<T, SimpleObjectProperty<*>>>) =
         pairs.forEach { addColumn(it.first, it.second) }
@@ -164,13 +174,12 @@ class EntityTableView<T: AbstractEntity> : TableView<T>() {
     fun getPropertyBy(column: TableColumn<*, *>) =
         propertyColumnMap.entries.first { it.value == column }.key
 
-    fun handleProperties(handler: PropertyHandler<T>) {
+    fun handleEditableProperties(handler: PropertyHandler<T>) {
         for ((function, name, property) in editablePropertyHandlerList) {
+            if (isReadonly(property)) continue
             function.call(handler, name, property)
         }
     }
-
-
 
     interface PropertyHandler<T> {
         fun handleIntegerProperty(
@@ -252,19 +261,21 @@ class BuildObjectTableViewFactory : TableViewFactory {
             "Участок" to BuildObject::plot,
             "Заказчик" to BuildObject::customer
         )
-        validator.setValidator<LocalDate>(BuildObject::startDate, "Дата окончания строительства >= дата начала строительства") { newValue, rowItem ->
+        validator.setValidator<LocalDate>(
+            BuildObject::startDate,
+            "Дата окончания строительства >= дата начала строительства"
+        ) { newValue, rowItem ->
             newValue ?: return@setValidator false
             rowItem.finishDate.value ?: return@setValidator true
             newValue <= rowItem.finishDate.value
         }
-        validator.setValidator<LocalDate>(BuildObject::finishDate, "Дата окончания строительства >= дата начала строительства") {newValue, rowItem ->
+        validator.setValidator<LocalDate>(
+            BuildObject::finishDate,
+            "Дата окончания строительства >= дата начала строительства"
+        ) { newValue, rowItem ->
             newValue ?: return@setValidator true
             rowItem.startDate.value ?: return@setValidator false
             newValue >= rowItem.startDate.value
-        }
-        validator.setValidator<Long>(BuildObject::id, "Значение должно быть >= 0") {newValue, _ ->
-            newValue ?: return@setValidator true
-            newValue >= 0
         }
         validator.setValidator<Prototype>(BuildObject::prototype, "Значение не может быть пусто") { newValue, _ ->
             newValue ?: return@setValidator false
@@ -278,6 +289,8 @@ class BuildObjectTableViewFactory : TableViewFactory {
             newValue ?: return@setValidator false
             true
         }
+        setReadonly(BuildObject::id)
+
 
         this
     }

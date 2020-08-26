@@ -73,7 +73,7 @@ class CommonService<T : AbstractEntity>(private val dtoClass: KClass<T>) : APICo
         return mapToDto(executeCall(call))
     }
 
-    fun executeCall(call: Call<ResponseBody>): String {
+    private fun executeCall(call: Call<ResponseBody>): String {
         val response = call.execute()
         if (!response.isSuccessful) {
             throw IOException(if (response.errorBody() != null) response.errorBody()!!.string() else "Unknown error")

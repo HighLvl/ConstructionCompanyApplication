@@ -169,6 +169,12 @@ class EditView<T : AbstractEntity>(
 
             override fun handleLongProperty(name: String, property: KProperty1<T, ObjectProperty<Long>>) {
                 val column = tableView.getColumnBy(property) as TableColumn<T, Long>
+                if(property.name == AbstractEntity::id.name) {
+                    column.setOnEditStart {
+                        alert(Alert.AlertType.INFORMATION, "Только для чтения")
+                    }
+                    return
+                }
                 val exceptionHandledUnitConverter = object : LongStringConverter() {
                     override fun fromString(string: String?): Long {
                         val prevValue = property.get(tableView.selectedItem!!).value

@@ -1,8 +1,10 @@
 package com.example.ConstructionCompanyApplication.ui.configuration
 
 import com.example.ConstructionCompanyApplication.dto.*
+import com.example.ConstructionCompanyApplication.dto.query.Report
 import com.example.ConstructionCompanyApplication.ui.view.*
 import com.example.ConstructionCompanyApplication.ui.view.filter.BuildObjectFilterViewFactory
+import com.example.ConstructionCompanyApplication.ui.view.filter.ReportFilterViewFactory
 import kotlin.reflect.KClass
 
 object EntityConfigurationProvider {
@@ -103,10 +105,15 @@ object EntityConfigurationProvider {
         WorkType::class to EntityConfiguration(
             WorkTypeTableViewFactory(),
             EntityMetadata("Вид работ", listOf(WorkType::name))
+        ),
+        Report::class to EntityConfiguration(
+            ReportTableViewFactory(),
+            EntityMetadata("Отчет"),
+            ReportFilterViewFactory()
         )
     )
 
-    val mapOfEntitiesByGroup = mapOf<String, List<KClass<out AbstractEntity>>>(
+    val mapOfEntitiesByGroup = mapOf(
         "Сотрудники" to listOf(Staff::class, Title::class, TitleCategory::class),
         "Заказчики" to listOf(Customer::class),
         "Бригады" to listOf(Brigade::class, BrigadeMember::class, ObjectBrigade::class),
@@ -124,7 +131,7 @@ object EntityConfigurationProvider {
             Machinery::class,
             ObjectMachinery::class
         ),
-        "Строительные материалы" to listOf(Material::class)
+        "Строительные материалы" to listOf(Material::class, Report::class)
     )
 
     fun get(entityClass: KClass<*>): EntityConfiguration =

@@ -1,6 +1,7 @@
 package com.example.ConstructionCompanyApplication.ui.view
 
 import com.example.ConstructionCompanyApplication.dto.*
+import com.example.ConstructionCompanyApplication.dto.query.Report
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.property.SimpleObjectProperty
@@ -471,6 +472,25 @@ class WorkScheduleTableViewFactory : TableViewFactory {
 class WorkTypeTableViewFactory : TableViewFactory {
     override fun create(): EntityTableView<*> = with(EntityTableView<WorkType>()) {
         addColumns("Название" to WorkType::name)
+        this
+    }
+}
+
+class ReportTableViewFactory : TableViewFactory {
+    override fun create(): EntityTableView<*> = with(EntityTableView<Report>()) {
+        addColumns(
+            "Бригада" to Report::brigade,
+            "Объект" to Report::buildObject,
+            "Вид работ" to Report::workType,
+            "Начало работ" to Report::startDate,
+            "Конец работ" to Report::finishDate,
+            "Срок, дни" to Report::deadline,
+            "Превышение сроков, дни" to Report::timeOverrun,
+            "Материал" to Report::material,
+            "Расход" to Report::consAmount,
+            "Смета" to Report::estAmount,
+            "Перерасход" to Report::matConsOverrun
+        )
         this
     }
 }

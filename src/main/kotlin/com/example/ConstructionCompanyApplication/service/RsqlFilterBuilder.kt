@@ -29,7 +29,12 @@ class RsqlFilterBuilder {
     fun lessOrEqual(prop: String, value: Any?): RsqlFilterBuilder {
         if (isEmpty(value)) return this
         expressionList += Triple(prop, LESS_OR_EQUAL, value!!)
-        "".isNullOrEmpty()
+        return this
+    }
+
+    fun greater(prop: String, value: Any?): RsqlFilterBuilder {
+        if (isEmpty(value)) return this
+        expressionList += Triple(prop, GREATER, value!!)
         return this
     }
 
@@ -40,6 +45,7 @@ class RsqlFilterBuilder {
     private companion object {
         const val EQUAL = "=="
         const val GREATER_OR_EQUAL = ">="
+        const val GREATER = ">"
         const val LESS_OR_EQUAL = "<="
         const val AND = ";"
     }

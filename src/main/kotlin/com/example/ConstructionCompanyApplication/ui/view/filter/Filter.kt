@@ -1,16 +1,20 @@
 package com.example.ConstructionCompanyApplication.ui.view.filter
 
-import com.example.ConstructionCompanyApplication.dto.BuildObject
-import com.example.ConstructionCompanyApplication.dto.Customer
-import com.example.ConstructionCompanyApplication.dto.Plot
-import com.example.ConstructionCompanyApplication.dto.Prototype
+import com.example.ConstructionCompanyApplication.dto.*
+import com.example.ConstructionCompanyApplication.dto.query.Report
 import com.example.ConstructionCompanyApplication.service.RsqlFilterBuilder
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.TextFormatter
 import tornadofx.*
 import java.time.LocalDate
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
+
+fun toFilterKey(vararg properties: KProperty1<*, *>): String {
+    return properties.map { it.name }.toList().joinToString(".")
+}
 
 class BuildObjectFilter : Filter {
     val number = SimpleObjectProperty<String>()
@@ -25,11 +29,40 @@ class BuildObjectFilter : Filter {
             .equal(BuildObject::id.name, number.value)
             .greaterOrEqual(BuildObject::startDate.name, startDate.value)
             .lessOrEqual(BuildObject::finishDate.name, finishDate.value)
-            .equal(BuildObject::prototype.name + "." + Prototype::id.name, projectNumber.value)
-            .equal(BuildObject::plot.name + "." + Plot::id.name, plotNumber.value)
-            .substring(BuildObject::customer.name + "." + Customer::name.name, customerName.value)
+            .equal(toFilterKey(BuildObject::prototype, Prototype::id), projectNumber.value)
+            .equal(toFilterKey(BuildObject::plot, Plot::id), plotNumber.value)
+            .substring(toFilterKey(BuildObject::customer, Customer::name), customerName.value)
             .build()
 
+    }
+}
+
+class ReportFilter : Filter {
+    val buildObjectNumber = SimpleObjectProperty<String>()
+    val brigadeName = SimpleObjectProperty<String>()
+    val managementNumber = SimpleObjectProperty<String>()
+    val plotNumber = SimpleObjectProperty<String>()
+    val workTypeName = SimpleObjectProperty<String>()
+    val startDate = SimpleObjectProperty<LocalDate>()
+    val finishDate = SimpleObjectProperty<LocalDate>()
+    val isOverDeadline = SimpleObjectProperty<Boolean>()
+    val isOverEstimate = SimpleObjectProperty<Boolean>()
+
+    override fun buildRsql(): String {
+        return RsqlFilterBuilder()
+            .equal(toFilterKey(Report::buildObject, BuildObject::id), buildObjectNumber.value)
+            .substring(toFilterKey(Report::brigade, Brigade::name), brigadeName.value)
+            .equal(
+                toFilterKey(Report::buildObject, BuildObject::plot, Plot::management, Management::id),
+                managementNumber.value
+            )
+            .equal(toFilterKey(Report::buildObject, BuildObject::plot, Plot::id), plotNumber.value)
+            .substring(toFilterKey(Report::workType, WorkType::name), workTypeName.value)
+            .greaterOrEqual(Report::startDate.name, startDate.value)
+            .lessOrEqual(Report::finishDate.name, finishDate.value)
+            .greater(Report::timeOverrun.name, if (isOverDeadline.value == false) null else 0)
+            .greater(Report::matConsOverrun.name, if (isOverEstimate.value == false) null else 0)
+            .build()
     }
 }
 
@@ -38,30 +71,63 @@ interface Filter {
     fun buildRsql(): String
 }
 
-abstract class FilterView<T : Filter>(filterClass: KClass<T>) : View() {
+open class FilterView<T : Filter>(filterName: String, filterClass: KClass<T>) : View() {
     lateinit var onSearchRequest: (rsql: String) -> Unit
 
-    protected val itemViewModel = run {
+    val itemViewModel = run {
         val model = ItemViewModel<T>()
         model.item = filterClass.createInstance()
         model
     }
 
-    protected val positiveNumberFilter: (TextFormatter.Change) -> Boolean = { change ->
-        !change.isAdded || change.controlNewText.let {
-            it.isLong() && it.toLong() > 0
-        }
-    }
+    val fieldSet = Fieldset(filterName)
+
     override val root = form {
-        add(createFieldSet())
+        add(fieldSet)
         button("Поиск").action {
             itemViewModel.commit()
             onSearchRequest(itemViewModel.item.buildRsql())
         }
         maxWidth = 400.0
     }
+}
 
-    abstract protected fun createFieldSet(): Fieldset
+class FilterViewBuilder<T: Filter>(filterName: String, filterClass: KClass<T>) {
+    private val filterView = FilterView(filterName, filterClass)
+    private val fieldSet = filterView.fieldSet
+    private val itemViewModel = filterView.itemViewModel
+    private val positiveNumberFilter: (TextFormatter.Change) -> Boolean = { change ->
+        !change.isAdded || change.controlNewText.let {
+            it.isLong() && it.toLong() > 0
+        }
+    }
+
+    fun addPositiveNumberField(name: String, property: KProperty1<T, SimpleObjectProperty<String>>): FilterViewBuilder<T> {
+        fieldSet.field(name) {
+            textfield(itemViewModel.bind(property)) {
+                filterInput(positiveNumberFilter)
+            }
+        }
+        return this
+    }
+
+    fun addDatePickerField(name: String, property: KProperty1<T, SimpleObjectProperty<LocalDate>>): FilterViewBuilder<T> {
+        fieldSet.field(name) { datepicker(itemViewModel.bind(property)) }
+        return this
+    }
+
+    fun addTextField(name: String, property: KProperty1<T, SimpleObjectProperty<String>>): FilterViewBuilder<T> {
+        fieldSet.field(name) { textfield(itemViewModel.bind(property)) }
+        return this
+    }
+
+    fun addCheckBoxField(name: String, property: KProperty1<T, SimpleObjectProperty<Boolean>>): FilterViewBuilder<T> {
+        fieldSet.field(name) {checkbox(property = itemViewModel.bind(property))  }
+        return this
+    }
+
+    fun build() = filterView
+
 
 }
 
@@ -70,27 +136,27 @@ interface FilterViewFactory {
 }
 
 class BuildObjectFilterViewFactory : FilterViewFactory {
-    override fun create(): FilterView<*> = object : FilterView<BuildObjectFilter>(BuildObjectFilter::class) {
-        override fun createFieldSet(): Fieldset = with(Fieldset("Фильтр объекта")) {
-            field("Номер объекта") {
-                textfield(itemViewModel.bind(BuildObjectFilter::number)) {
-                    filterInput(positiveNumberFilter)
-                }
-            }
-            field("Начало строительсва") { datepicker(itemViewModel.bind(BuildObjectFilter::startDate)) }
-            field("Конец строительсва") { datepicker(itemViewModel.bind(BuildObjectFilter::finishDate)) }
-            field("Номер проекта") {
-                textfield(itemViewModel.bind(BuildObjectFilter::projectNumber)) {
-                    filterInput(positiveNumberFilter)
-                }
-            }
-            field("Номер участка") {
-                textfield(itemViewModel.bind(BuildObjectFilter::plotNumber)) {
-                    filterInput(positiveNumberFilter)
-                }
-            }
-            field("Заказчик") { textfield(itemViewModel.bind(BuildObjectFilter::customerName)) }
-            return@with this
-        }
-    }
+    override fun create() = FilterViewBuilder("Номер объекта", BuildObjectFilter::class)
+            .addPositiveNumberField("Номер объекта", BuildObjectFilter::number)
+            .addDatePickerField("Начало строительсва", BuildObjectFilter::startDate)
+            .addDatePickerField("Конец строительсва", BuildObjectFilter::finishDate)
+            .addPositiveNumberField("Номер проекта", BuildObjectFilter::projectNumber)
+            .addPositiveNumberField("Номер участка", BuildObjectFilter::plotNumber)
+            .addTextField("Заказчик", BuildObjectFilter::customerName)
+            .build()
+}
+
+class ReportFilterViewFactory : FilterViewFactory {
+    override fun create(): FilterView<*> = FilterViewBuilder("Номер объекта", ReportFilter::class)
+        .addPositiveNumberField("Номер объекта", ReportFilter::buildObjectNumber)
+        .addTextField("Бригада", ReportFilter::brigadeName)
+        .addPositiveNumberField("Номер управления", ReportFilter::managementNumber)
+        .addPositiveNumberField("Номер участка", ReportFilter::plotNumber)
+        .addTextField("Вид работ", ReportFilter::workTypeName)
+        .addDatePickerField("Начало работ", ReportFilter::startDate)
+        .addDatePickerField("Конец работ", ReportFilter::finishDate)
+        .addCheckBoxField("Превышение сроков", ReportFilter::isOverDeadline)
+        .addCheckBoxField("Перерасход", ReportFilter::isOverEstimate)
+        .build()
+
 }

@@ -53,6 +53,7 @@ class EditView<T : AbstractEntity>(
 
     private var dataSourceUrlProperty = SimpleStringProperty("")
     private val toDeleteList = observableListOf<T>()
+    private val deleteColumn = DeleteTableColumn(toDeleteList)
 
     private var tableViewEditModel: TableViewEditModel<T> by singleAssign()
 
@@ -78,6 +79,15 @@ class EditView<T : AbstractEntity>(
         initRefreshButton()
         initSortBox()
         initFilterPane()
+    }
+
+    fun setReadonlyMode() {
+        tableView.isEditable = false
+        tableView.selectionModel.isCellSelectionEnabled = false
+        saveButton.isVisible = false
+        cancelButton.isVisible = false
+        addElementButton.isVisible = false
+        tableView.columns.remove(deleteColumn)
     }
 
     private fun initFilterPane() {
@@ -152,11 +162,7 @@ class EditView<T : AbstractEntity>(
         tableView.isEditable = true
         tableView.enableCellEditing()
         tableView.enableDirtyTracking()
-        tableView.addColumnInternal(
-            DeleteTableColumn(
-                toDeleteList
-            )
-        )
+        tableView.addColumnInternal(deleteColumn)
         tableViewEditModel = tableView.editModel
 
         tableView.readonlyProperties.forEach {

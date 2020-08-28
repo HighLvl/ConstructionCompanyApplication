@@ -3,7 +3,6 @@ package com.example.ConstructionCompanyApplication
 import com.example.ConstructionCompanyApplication.ui.configuration.EntityConfigurationProvider
 import com.example.ConstructionCompanyApplication.ui.view.MainTabPane
 import javafx.scene.control.TreeItem
-import javafx.stage.Screen
 import javafx.stage.Stage
 import tornadofx.*
 
@@ -13,10 +12,10 @@ class StartView : View("Строительная организация") {
     override val root = borderpane {
         left {
             val actionMap = mutableMapOf<TreeItem<*>, () -> Unit>()
-            val rootTreeItem = TreeItem("Таблицы")
-            rootTreeItem.isExpanded = true
+            val rootTreeItem = TreeItem("")
 
-
+            val tableTreeItem = TreeItem("Таблицы")
+            tableTreeItem.isExpanded = true
             for ((groupName, entityList) in EntityConfigurationProvider.mapOfEntitiesByGroup) {
                 val childItem = TreeItem(groupName)
                 entityList.forEach {
@@ -26,14 +25,25 @@ class StartView : View("Строительная организация") {
                     }
                     childItem.children.add(nestedItem)
                 }
-                rootTreeItem.children.add(childItem)
+                tableTreeItem.children.add(childItem)
             }
 
+            val queryTreeItem = TreeItem("Запросы")
+            queryTreeItem.isExpanded = true
+            for ((groupName, query) in EntityConfigurationProvider.mapOfQueries) {
+                val childItem = TreeItem(groupName)
+                actionMap[childItem] = { tabPane.tab(query, isReadonly = true) }
+                queryTreeItem.children.add(childItem)
+            }
+
+            rootTreeItem.children.add(tableTreeItem)
+            rootTreeItem.children.add(queryTreeItem)
             treeview(rootTreeItem) {
                 prefWidth = 320.0
                 selectionModel.selectedItemProperty().addListener { _, oldValue, newValue ->
                     actionMap[newValue]?.invoke()
                 }
+                isShowRoot = false
             }
 
         }

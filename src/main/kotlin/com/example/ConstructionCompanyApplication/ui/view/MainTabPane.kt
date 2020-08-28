@@ -8,12 +8,15 @@ import tornadofx.*
 import kotlin.reflect.KClass
 
 class MainTabPane: TabPane() {
-    fun tab(entityClass: KClass<out AbstractEntity>, dataSource: String? = null, info: String? = null) {
+    fun tab(entityClass: KClass<out AbstractEntity>, dataSource: String? = null, info: String? = null, isReadonly: Boolean = false) {
         val view = EditView(entityClass)
         if (dataSource != null) {
             view.setDataSource(dataSource)
         }
         val prefix = if(info != null) "$info: " else ""
         selectionModel.select(tab(prefix + view.title, view.root))
+        if(isReadonly) {
+            view.setReadonlyMode()
+        }
     }
 }

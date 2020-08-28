@@ -134,6 +134,10 @@ object EntityConfigurationProvider {
         "Строительные материалы" to listOf(Material::class, Report::class)
     )
 
+    val mapOfQueries = mapOf(
+        "Отчет" to Report::class
+    )
+
     fun get(entityClass: KClass<*>): EntityConfiguration =
         configurationMap[entityClass] ?: error("Configuration is not defined for $entityClass")
 

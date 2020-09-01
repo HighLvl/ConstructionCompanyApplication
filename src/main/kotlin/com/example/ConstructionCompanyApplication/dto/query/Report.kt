@@ -12,11 +12,8 @@ class Report(
     finishDate: LocalDate? = null,
     deadline: Int? = null,
     timeOverrun: Int? = null,
-    material: Material? = null,
-    consAmount: Int? = null,
-    estAmount: Int? = null,
-    matConsOverrun: Int? = null
-): AbstractEntity() {
+    id: Long? = null
+): AbstractEntity(id) {
     val brigade = SimpleObjectProperty<Brigade>(brigade)
     val buildObject = SimpleObjectProperty<BuildObject>(buildObject)
     val workType = SimpleObjectProperty<WorkType>(workType)
@@ -24,8 +21,8 @@ class Report(
     val finishDate = SimpleObjectProperty<LocalDate>(finishDate)
     val deadline = SimpleObjectProperty<Int>(deadline)
     val timeOverrun = SimpleObjectProperty<Int>(timeOverrun)
-    val material = SimpleObjectProperty<Material>(material)
-    val consAmount = SimpleObjectProperty<Int>(consAmount)
-    val estAmount = SimpleObjectProperty<Int>(estAmount)
-    val matConsOverrun = SimpleObjectProperty<Int>(matConsOverrun)
+
+    override fun toString(): String {
+        return id.value.toString()
+    }
 }

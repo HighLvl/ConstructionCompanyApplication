@@ -1,6 +1,7 @@
 package com.example.ConstructionCompanyApplication.service
 
 import com.example.ConstructionCompanyApplication.dto.*
+import com.example.ConstructionCompanyApplication.dto.query.MaterialConsumptionReport
 import com.example.ConstructionCompanyApplication.dto.query.Report
 import kotlin.reflect.KClass
 
@@ -31,7 +32,8 @@ object EntityEndpointMapper {
             TitleCategory::class to "/titleCategories",
             WorkSchedule::class to "/workSchedules",
             WorkType::class to "/workTypes",
-            Report::class to "/report"
+            Report::class to "/report",
+            MaterialConsumptionReport::class to "/materialConsumptionReport"
         )
     }
 

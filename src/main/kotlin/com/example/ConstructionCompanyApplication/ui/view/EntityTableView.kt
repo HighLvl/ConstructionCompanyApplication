@@ -1,6 +1,7 @@
 package com.example.ConstructionCompanyApplication.ui.view
 
 import com.example.ConstructionCompanyApplication.dto.*
+import com.example.ConstructionCompanyApplication.dto.query.MaterialConsumptionReport
 import com.example.ConstructionCompanyApplication.dto.query.Report
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
@@ -485,11 +486,21 @@ class ReportTableViewFactory : TableViewFactory {
             "Начало работ" to Report::startDate,
             "Конец работ" to Report::finishDate,
             "Срок, дни" to Report::deadline,
-            "Превышение сроков, дни" to Report::timeOverrun,
-            "Материал" to Report::material,
-            "Расход" to Report::consAmount,
-            "Смета" to Report::estAmount,
-            "Перерасход" to Report::matConsOverrun
+            "Превышение сроков, дни" to Report::timeOverrun
+        )
+        this
+    }
+}
+
+
+class MaterialConsumptionReportTableViewFactory : TableViewFactory {
+    override fun create(): EntityTableView<*> = with(EntityTableView<MaterialConsumptionReport>()) {
+        addColumns(
+            "Отчет" to MaterialConsumptionReport::report,
+            "Материал" to MaterialConsumptionReport::material,
+            "Расход" to MaterialConsumptionReport::consAmount,
+            "Смета" to MaterialConsumptionReport::estAmount,
+            "Перерасход" to MaterialConsumptionReport::matConsOverrun
         )
         this
     }

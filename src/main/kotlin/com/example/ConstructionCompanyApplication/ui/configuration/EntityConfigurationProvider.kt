@@ -1,9 +1,11 @@
 package com.example.ConstructionCompanyApplication.ui.configuration
 
 import com.example.ConstructionCompanyApplication.dto.*
+import com.example.ConstructionCompanyApplication.dto.query.MaterialConsumptionReport
 import com.example.ConstructionCompanyApplication.dto.query.Report
 import com.example.ConstructionCompanyApplication.ui.view.*
 import com.example.ConstructionCompanyApplication.ui.view.filter.BuildObjectFilterViewFactory
+import com.example.ConstructionCompanyApplication.ui.view.filter.MaterialConsumptionReportFilterViewFactory
 import com.example.ConstructionCompanyApplication.ui.view.filter.ReportFilterViewFactory
 import kotlin.reflect.KClass
 
@@ -110,6 +112,11 @@ object EntityConfigurationProvider {
             ReportTableViewFactory(),
             EntityMetadata("Отчет"),
             ReportFilterViewFactory()
+        ),
+        MaterialConsumptionReport::class to EntityConfiguration(
+            MaterialConsumptionReportTableViewFactory(),
+            EntityMetadata("Отчет по расходу материалов"),
+            MaterialConsumptionReportFilterViewFactory()
         )
     )
 
@@ -131,11 +138,12 @@ object EntityConfigurationProvider {
             Machinery::class,
             ObjectMachinery::class
         ),
-        "Строительные материалы" to listOf(Material::class, Report::class)
+        "Строительные материалы" to listOf(Material::class)
     )
 
     val mapOfQueries = mapOf(
-        "Отчет" to Report::class
+        "Отчет" to Report::class,
+        "Отчет по расходу материалов" to MaterialConsumptionReport::class
     )
 
     fun get(entityClass: KClass<*>): EntityConfiguration =

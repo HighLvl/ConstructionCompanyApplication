@@ -10,6 +10,6 @@ class Management(
     val chief = SimpleObjectProperty<Staff>(chief)
 
     override fun toString(): String {
-        return id.value?.toString().orEmpty()
+        return toWordSequence(id, chief)
     }
 }

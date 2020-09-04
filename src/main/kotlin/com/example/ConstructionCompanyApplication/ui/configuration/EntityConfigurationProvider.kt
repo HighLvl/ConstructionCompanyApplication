@@ -9,6 +9,7 @@ import com.example.ConstructionCompanyApplication.ui.view.filter.MaterialConsump
 import com.example.ConstructionCompanyApplication.ui.view.filter.ReportFilterViewFactory
 import kotlin.reflect.KClass
 
+/*Предоставляет по классу сущности конфигурацию, содержащую фабрики для создания специфичных view, а так же другие метаданные*/
 object EntityConfigurationProvider {
     private val configurationMap: Map<KClass<*>, EntityConfiguration> = mapOf(
         Brigade::class to EntityConfiguration(

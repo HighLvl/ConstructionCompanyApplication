@@ -11,6 +11,7 @@ import java.time.LocalDate
 import kotlin.error
 import kotlin.reflect.KProperty1
 
+/*Валидаторы для конкретных view, позволяющих редактировать данные*/
 fun <T: AbstractEntity>DatePicker.addValidator(validator: EntityValidator<T>, property: KProperty1<T, ObjectProperty<LocalDate>>) {
     validator {
         if (!validator.isValid(property, value)) error(

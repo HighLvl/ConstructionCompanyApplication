@@ -23,7 +23,7 @@ import java.time.LocalDate
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
-
+/*Форма для редактирования записей*/
 @Suppress("UNCHECKED_CAST")
 class EditView<T : AbstractEntity>(
     private val entityClass: KClass<T>

@@ -19,6 +19,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
 
+/*Форма для добавления записей*/
 @Suppress("UNCHECKED_CAST")
 class CreateView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {

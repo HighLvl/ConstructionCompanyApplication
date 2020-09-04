@@ -23,7 +23,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import java.io.IOException
 import kotlin.reflect.KClass
 
-
+/*Сервис, работающий с репозиторием. Сериализиует и отправляет данные, получает данные и десериализует, обрабатывает ошибки.*/
 class CommonService<T : AbstractEntity>(private val dtoClass: KClass<T>) : APIConfiguration {
     private val objectMapper = ObjectMapper().registerModules(
         Jackson2HalModule(),

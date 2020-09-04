@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer
 import javafx.beans.property.SimpleObjectProperty
 
+/*Десериализует поля в javafx SimpleObjectProperty, используемые в gui сущностях*/
 class SimpleObjectPropertyDeserializer : JsonDeserializer<SimpleObjectProperty<*>>(),
     ContextualDeserializer {
     private lateinit var valueType: JavaType

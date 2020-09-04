@@ -4,7 +4,7 @@ import com.example.ConstructionCompanyApplication.controller.CommonController
 import io.reactivex.Single
 import javafx.scene.control.*
 import tornadofx.*
-
+/* Инициализация view, необходимых для пагинации, загрузка страницы*/
 class EntityTableViewPagination(
     private val pagination: Pagination,
     private val tableView: EntityTableView<*>,
@@ -15,6 +15,7 @@ class EntityTableViewPagination(
     private val totalElementsLabel: Label
 ) {
     private var pageSize = 25
+    /*загручик страницы*/
     lateinit var loadPage: (pageIndex: Int, pageSize: Int) -> Single<CommonController.PageInfo>
 
     init {
@@ -36,6 +37,7 @@ class EntityTableViewPagination(
         pageSize100.action { changePageSize(100) }
     }
 
+    /*Загрузить страницу*/
     fun loadPage(pageIndex: Int) {
         loadPage.invoke(pageIndex, pageSize)
             .subscribe(

@@ -8,6 +8,7 @@ import tornadofx.*
 import java.time.LocalDate
 import kotlin.reflect.KProperty1
 
+/*Валидаторы для конкретных property, принадлежаших gui сущности*/
 @Suppress("UNCHECKED_CAST")
 class EntityValidator<T: AbstractEntity> {
     private val validatorMap = mutableMapOf<KProperty1<T, ObjectProperty<*>>, Pair<(Any?, T) -> Boolean, String>>()

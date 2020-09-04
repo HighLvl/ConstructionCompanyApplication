@@ -89,6 +89,7 @@ interface Filter {
     fun buildRsql(): String
 }
 
+/*Форма фильтрации*/
 open class FilterView<T : Filter>(filterName: String, filterClass: KClass<T>) : View() {
     lateinit var onSearchRequest: (rsql: String) -> Unit
 

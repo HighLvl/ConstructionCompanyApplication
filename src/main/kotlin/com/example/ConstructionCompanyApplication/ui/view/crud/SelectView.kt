@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest
 import tornadofx.*
 import kotlin.reflect.KClass
 
+/*Форма, вызывающаяся при изменении данных для выбора ссылаемой сущности*/
 @Suppress("UNCHECKED_CAST")
 class SelectView<T : AbstractEntity>(private val entityClass: KClass<T>) :
     View(EntityConfigurationProvider.get(entityClass).entityMetadata.name) {

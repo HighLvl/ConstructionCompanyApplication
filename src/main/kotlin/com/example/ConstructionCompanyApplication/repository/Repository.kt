@@ -7,6 +7,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
 
+/*Репозиторий со всеми необходимыми операциями для работы с данными*/
 @JvmSuppressWildcards
 interface Repository {
     @GET(".")

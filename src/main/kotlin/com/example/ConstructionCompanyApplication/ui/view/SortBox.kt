@@ -16,6 +16,7 @@ import tornadofx.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
+/*Сортировка*/
 class SortBox(private val tableView: EntityTableView<*>) : HBox() {
     private val label = label("Сортировать:")
     private val selectColumnComboBox = combobox(SimpleObjectProperty<TableColumn<*, *>>())
@@ -31,6 +32,7 @@ class SortBox(private val tableView: EntityTableView<*>) : HBox() {
     val selectColumnProperty: ObjectProperty<TableColumn<*, *>> = selectColumnComboBox.valueProperty()
     val directionProperty: ObjectProperty<String> = directionComboBox.valueProperty()
 
+    /*Направление сортировки и сортируемые столбцы. Сортировка ссылаемых сущностей происходит по вложенным полям*/
     val sort: Sort
         get() {
             val sortProperties = getAllSortProperties() ?: return Sort.unsorted()

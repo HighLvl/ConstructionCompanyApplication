@@ -13,14 +13,20 @@ import org.springframework.hateoas.PagedModel
 import tornadofx.*
 import kotlin.reflect.KClass
 
+/*Контроллер для загрузки, сохранения изменений*/
 class CommonController<T : AbstractEntity>(entityClass: KClass<T>) {
     val dataList = observableListOf<T>()
+    /*ссылки на ссылаемые и ссылающиеся записи на конкретную запись*/
     val itemRelatedLinksMap = observableMapOf<T, ObservableList<LinkInfo>>()
+    /*ссылки на ссылаемые и ссылающиеся таблицы*/
     val tableRelatedLinksList = observableListOf<LinkInfo>()
+    /*фильтр в rsql формате*/
     var filter: String = ""
 
     private val service = CommonService(entityClass)
 
+    /*Загрузить страницу данных из корня, по ссылке или с использованием фильтра.
+    * Распарсить ссылки на ссылаемые и ссылающиеся таблицы*/
     fun loadAll(pageable: Pageable, url: String = ""): Single<PageInfo> {
         return Single.fromCallable {
             if (filter.isEmpty())
@@ -35,6 +41,7 @@ class CommonController<T : AbstractEntity>(entityClass: KClass<T>) {
             }
     }
 
+    /*Удалить и изменить данные*/
     fun saveAll(toDelete: Collection<T>, toSave: Collection<T>): Single<Unit> = Single.fromCallable {
         if (toDelete.isNotEmpty())
             service.deleteAll(toDelete)
